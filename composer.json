@@ -1,0 +1,16 @@
+{
+  "name": "pimcore/personalized-search",
+  "type": "pimcore-bundle",
+  "autoload": {
+    "psr-4": {
+      "PersonalizedSearchBundle\\": ""
+    }
+  },
+  "extra": {
+    "pimcore": {
+      "bundles": [
+        "PersonalizedSearchBundle\\PersonalizedSearchBundle"
+      ]
+    }
+  }
+}
