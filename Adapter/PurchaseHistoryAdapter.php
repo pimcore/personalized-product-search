@@ -38,8 +38,8 @@ class PurchaseHistoryAdapter extends AbstractAdapter
             $segmentCount = $segment['segmentCount'];
             // echo 'Segment Id: ' . $segmentId . ', Segment Count: ' . $segmentCount . '<br>';
             $functions[] = [
-            'filter' => [
-                'match' => ['relations.segments' => $segmentId]],
+                'filter' => [
+                    'match' => ['relations.segments' => $segmentId]],
                 'weight' => $segmentCount * 6
             ];
         }

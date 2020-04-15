@@ -33,11 +33,22 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
         $params = [
             'index' => self::$indexName,
             'type' => '_doc',
-            'id' => $customerId
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'customerId' => $customerId
+                    ]
+                ]
+            ]
         ];
 
-        $response = $this->esClient->get($params);
-        return $response['_source']['segments'];
+        $response = $this->esClient->search($params)['hits']['hits'];
+
+        if(sizeof($response) === 0) {
+            return [];
+        }
+
+        return $response[0]['_source']['segments'];
     }
 
     public function index(int $documentId, array $body)
