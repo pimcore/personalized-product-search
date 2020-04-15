@@ -1,0 +1,105 @@
+<?php
+
+namespace PersonalizedSearchBundle\ExtractTransformLoad;
+
+use CustomerManagementFrameworkBundle\SegmentManager\DefaultSegmentManager;
+use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
+use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Model\DataObject;
+use Elasticsearch\ClientBuilder;
+
+class PurchaseHistoryProvider implements PurchaseHistoryInterface
+{
+    private $segmentGetter;
+
+    public function __construct(GetterInterface $getter) {
+        $this->segmentGetter = $getter;
+    }
+
+    public function UpdateOrderIndexFromOrderDb() {
+        $customers = new DataObject\Customer\Listing();
+
+        foreach($customers as $customer) {
+            $customerInfo = self::GetPurchaseHistory($customer->getId());
+            self::FillOrderIndex($customerInfo);
+        }
+    }
+
+    public function FillOrderIndex(object $customerInfo) {
+        $client = ClientBuilder::create()->build();
+
+        $params = [
+            'index' => 'order_index',
+            'type' => 'doc',
+            'id' => $customerInfo->customerId,
+            'body' => $customerInfo
+        ];
+        $client->index($params);
+    }
+
+    public function GetPurchaseHistory(int $customerId): object
+    {
+        $orderManager = Factory::getInstance()->getOrderManager();
+
+        $orderList =  $orderManager->createOrderList();
+        $orderQuery = $orderList->getQuery();
+
+        $orderList->joinCustomer(\Pimcore\Model\DataObject\Customer::classId());
+        $orderQuery->where('customer.o_id = ?', $customerId);
+
+
+        $customerInfo = new CustomerInfo($customerId);
+
+        foreach($orderList as $order)
+        {
+            foreach($order->getItems() as $item)
+            {
+                $product = $item->getProduct();
+
+                $segments = $this->segmentGetter->get($product);
+
+                foreach ($segments as $segment)
+                {
+                    $segmentId = $segment->getId();
+                    $found = false;
+                    foreach($customerInfo->segments as $e)
+                    {
+                        if($e->segmentId === $segmentId)
+                        {
+                            $e->segmentCount++;
+                            $found = true;
+                        }
+                    }
+
+                    if(!$found){
+                        $segmentInfo = new SegmentInfo($segmentId, 1);
+                        $customerInfo->segments[] = $segmentInfo;
+                    }
+                }
+            }
+        }
+        return $customerInfo;
+    }
+}
+
+class CustomerInfo {
+    public $customerId;
+    public $segments;
+
+    public function __construct($customerId) {
+        $this->customerId = $customerId;
+        $this->segments = [];
+    }
+};
+
+class SegmentInfo {
+
+    public $segmentId;
+    public $segmentCount;
+
+    public function __construct($segmentId, $segmentCount)
+    {
+        $this->segmentId = $segmentId;
+        $this->segmentCount = $segmentCount;
+    }
+}
