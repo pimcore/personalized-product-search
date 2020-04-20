@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\Adapter;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
 interface AdapterInterface
 {
