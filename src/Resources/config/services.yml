@@ -9,5 +9,5 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
 
-    PersonalizedSearchBundle\Adapter\SegmentAdapter: ~
-    PersonalizedSearchBundle\Adapter\AccessoryAdapter: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\Adapter\SegmentAdapter: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\Adapter\AccessoryAdapter: ~
