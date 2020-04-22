@@ -1,6 +1,6 @@
 <?php
 
-namespace PersonalizedSearchBundle\ExtractTransformLoad;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 use CustomerManagementFrameworkBundle\SegmentManager\DefaultSegmentManager;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;

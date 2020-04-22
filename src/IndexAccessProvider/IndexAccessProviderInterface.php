@@ -1,6 +1,6 @@
 <?php
 
-namespace PersonalizedSearchBundle\IndexAccessProvider;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 interface IndexAccessProviderInterface
 {

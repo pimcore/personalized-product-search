@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\ExtractTransformLoad;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 interface PurchaseHistoryInterface
 {

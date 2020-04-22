@@ -1,9 +1,9 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\Adapter;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
-use PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 
 class PurchaseHistoryAdapter extends AbstractAdapter
