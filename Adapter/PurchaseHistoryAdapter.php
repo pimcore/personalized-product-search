@@ -29,7 +29,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
     public function addPersonalization(array $query, float $weight = 1, string $boostMode = "multiply"): array
     {
         $customerId = Factory::getInstance()->getEnvironment()->getCurrentUserId();
-        $response = $this->orderIndex->getSegments($customerId);
+        $response = $this->orderIndex->fetchSegments($customerId);
 
         $functions = [];
 
@@ -42,6 +42,10 @@ class PurchaseHistoryAdapter extends AbstractAdapter
                     'match' => ['relations.segments' => $segmentId]],
                 'weight' => $segmentCount * 6
             ];
+        }
+
+        if(count($functions) == 0) {
+            return $query;
         }
 
         $purchaseHistoryQuery = [
