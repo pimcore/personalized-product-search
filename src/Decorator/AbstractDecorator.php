@@ -1,8 +1,8 @@
 <?php
 
-namespace PersonalizedSearchBundle\Decorator;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\Decorator;
 
-use PersonalizedSearchBundle\Adapter\AdapterInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\AdapterInterface;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\ProductList\ProductListInterface;
 
 abstract class AbstractDecorator implements AdapterInterface
