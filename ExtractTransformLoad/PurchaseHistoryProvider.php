@@ -2,7 +2,6 @@
 
 namespace PersonalizedSearchBundle\ExtractTransformLoad;
 
-use CustomerManagementFrameworkBundle\SegmentManager\DefaultSegmentManager;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
 use Pimcore\Model\DataObject;
@@ -16,16 +15,16 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $this->segmentGetter = $getter;
     }
 
-    public function UpdateOrderIndexFromOrderDb() {
+    public function updateOrderIndexFromOrderDb() {
         $customers = new DataObject\Customer\Listing();
 
         foreach($customers as $customer) {
-            $customerInfo = self::GetPurchaseHistory($customer->getId());
-            self::FillOrderIndex($customerInfo);
+            $customerInfo = self::getPurchaseHistory($customer->getId());
+            self::fillOrderIndex($customerInfo);
         }
     }
 
-    public function FillOrderIndex(object $customerInfo) {
+    public function fillOrderIndex(object $customerInfo) {
         $client = ClientBuilder::create()->build();
 
         $params = [
@@ -37,7 +36,7 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $client->index($params);
     }
 
-    public function GetPurchaseHistory(int $customerId): object
+    public function getPurchaseHistory(int $customerId): object
     {
         $orderManager = Factory::getInstance()->getOrderManager();
 

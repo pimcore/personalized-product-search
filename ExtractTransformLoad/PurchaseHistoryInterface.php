@@ -5,7 +5,7 @@ namespace PersonalizedSearchBundle\ExtractTransformLoad;
 
 interface PurchaseHistoryInterface
 {
-    public function GetPurchaseHistory(int $customerId) : object;
-    public function FillOrderIndex(object $customerInfo);
-    public function UpdateOrderIndexFromOrderDb();
+    public function getPurchaseHistory(int $customerId) : object;
+    public function fillOrderIndex(object $customerInfo);
+    public function updateOrderIndexFromOrderDb();
 }
