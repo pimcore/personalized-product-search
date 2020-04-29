@@ -4,15 +4,17 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface;
 use Pimcore\Model\DataObject;
-use Elasticsearch\ClientBuilder;
 
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
     private $segmentGetter;
+    private $indexAccessProvider;
 
-    public function __construct(GetterInterface $getter) {
+    public function __construct(GetterInterface $getter, IndexAccessProviderInterface $indexAccessProvider) {
         $this->segmentGetter = $getter;
+        $this->indexAccessProvider = $indexAccessProvider;
     }
 
     public function updateOrderIndexFromOrderDb() {
@@ -24,19 +26,11 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         }
     }
 
-    public function fillOrderIndex(object $customerInfo) {
-        $client = ClientBuilder::create()->build();
-
-        $params = [
-            'index' => 'order_segments',
-            'type' => '_doc',
-            'id' => $customerInfo->customerId,
-            'body' => $customerInfo
-        ];
-        $client->index($params);
+    public function fillOrderIndex(CustomerInfo $customerInfo) {
+        $this->indexAccessProvider->index($customerInfo->customerId, $customerInfo);
     }
 
-    public function getPurchaseHistory(int $customerId): object
+    public function getPurchaseHistory(int $customerId): CustomerInfo
     {
         $orderManager = Factory::getInstance()->getOrderManager();
 
