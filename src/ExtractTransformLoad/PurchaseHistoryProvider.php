@@ -6,7 +6,6 @@ use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
-use Elasticsearch\ClientBuilder;
 
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
@@ -27,11 +26,11 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         }
     }
 
-    public function fillOrderIndex(object $customerInfo) {
+    public function fillOrderIndex(CustomerInfo $customerInfo) {
         $this->orderIndexAccessProvider->index($customerInfo->customerId, $customerInfo);
     }
 
-    public function getPurchaseHistory(int $customerId): object
+    public function getPurchaseHistory(int $customerId): CustomerInfo
     {
         $orderManager = Factory::getInstance()->getOrderManager();
 
