@@ -28,8 +28,8 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $client = ClientBuilder::create()->build();
 
         $params = [
-            'index' => 'order_index',
-            'type' => 'doc',
+            'index' => 'order_segments',
+            'type' => '_doc',
             'id' => $customerInfo->customerId,
             'body' => $customerInfo
         ];
