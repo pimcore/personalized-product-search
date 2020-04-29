@@ -28,7 +28,7 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
      * @param int $customerId Customer id / user id
      * @return array Segment array
      */
-    public function getSegments(int $customerId): array
+    public function fetchSegments(int $customerId): array
     {
         $params = [
             'index' => self::$indexName,
@@ -51,8 +51,14 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
         return $response[0]['_source']['segments'];
     }
 
-    public function index(int $documentId, array $body)
+    public function index(int $documentId, object $body)
     {
-        // TODO: Implement index() method.
+        $params = [
+            'index' => self::$indexName,
+            'type' => '_doc',
+            'id' => $documentId,
+            'body' => $body
+        ];
+        $this->esClient->index($params);
     }
 }
