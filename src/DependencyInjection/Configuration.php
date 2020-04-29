@@ -1,6 +1,6 @@
 <?php
 
-namespace PersonalizedSearchBundle\DependencyInjection;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

@@ -3,13 +3,13 @@
   "type": "pimcore-bundle",
   "autoload": {
     "psr-4": {
-      "PersonalizedSearchBundle\\": ""
+      "Pimcore\\Bundle\\PersonalizedSearchBundle\\": "src"
     }
   },
   "extra": {
-    "pimcore": {
+    "pimcore": { 
       "bundles": [
-        "PersonalizedSearchBundle\\PersonalizedSearchBundle"
+        "Pimcore\\Bundle\\PersonalizedSearchBundle\\PersonalizedSearchBundle"
       ]
     }
   }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PersonalizedSearchBundle;
+namespace Pimcore\Bundle\PersonalizedSearchBundle;
 
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
 use Pimcore\Extension\Bundle\Traits\PackageVersionTrait;
