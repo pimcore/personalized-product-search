@@ -8,8 +8,6 @@ use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 
 class PurchaseHistoryAdapter extends AbstractAdapter
 {
-    public static $PURCHASE_WEIGHT_MULTIPLIER = 6;
-
     /**
      * @var OrderIndexAccessProvider
      */
@@ -41,7 +39,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight * self::$PURCHASE_WEIGHT_MULTIPLIER
+                'weight' => $segmentCount * $weight
             ];
         }
 
