@@ -28,7 +28,7 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
      * @param int $customerId Customer id / user id
      * @return array Segment array
      */
-    public function getSegments(int $customerId): array
+    public function fetchSegments(int $customerId): array
     {
         $params = [
             'index' => self::$indexName,
