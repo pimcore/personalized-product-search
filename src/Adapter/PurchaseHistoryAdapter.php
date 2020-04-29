@@ -8,6 +8,8 @@ use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 
 class PurchaseHistoryAdapter extends AbstractAdapter
 {
+    public static $PURCHASE_WEIGHT_MULTIPLIER = 6;
+
     /**
      * @var OrderIndexAccessProvider
      */
@@ -36,11 +38,10 @@ class PurchaseHistoryAdapter extends AbstractAdapter
         foreach($response as $segment) {
             $segmentId = $segment['segmentId'];
             $segmentCount = $segment['segmentCount'];
-            // echo 'Segment Id: ' . $segmentId . ', Segment Count: ' . $segmentCount . '<br>';
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * 6
+                'weight' => $segmentCount * $weight * self::$PURCHASE_WEIGHT_MULTIPLIER
             ];
         }
 
@@ -55,8 +56,6 @@ class PurchaseHistoryAdapter extends AbstractAdapter
                 'boost_mode' => $boostMode
             ]
         ];
-
-        // print_r($purchaseHistoryQuery);
 
         return $purchaseHistoryQuery;
     }
