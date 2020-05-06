@@ -18,3 +18,10 @@ services:
     Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface: '@AppBundle\Ecommerce\IndexService\SegmentGetter'
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider'
+
+    # ---------------------------------------------------------
+    # Register all commands of AppBundle as commands
+    # ---------------------------------------------------------
+    PersonalizedSearchBundle\src\Command\:
+        resource: '../../Command'
+        tags: ['console.command']
