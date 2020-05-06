@@ -4,7 +4,10 @@
   "autoload": {
     "psr-4": {
       "Pimcore\\Bundle\\PersonalizedSearchBundle\\": "src"
-    }
+    },
+    "exclude-from-classmap": [
+      "vendor/phpunit"
+    ]
   },
   "extra": {
     "pimcore": { 
@@ -12,5 +15,9 @@
         "Pimcore\\Bundle\\PersonalizedSearchBundle\\PersonalizedSearchBundle"
       ]
     }
+  },
+  "require-dev": {
+    "symfony/phpunit-bridge": "^5.0",
+    "phpstan/phpstan": "^0.12.19"
   }
 }
