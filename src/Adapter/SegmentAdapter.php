@@ -5,7 +5,6 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
 use CustomerManagementFrameworkBundle\Targeting\SegmentTracker;
 use Pimcore\Targeting\VisitorInfoStorage;
-use Psr\Log\LoggerInterface;
 
 class SegmentAdapter extends AbstractAdapter
 {
@@ -20,20 +19,13 @@ class SegmentAdapter extends AbstractAdapter
     private $segmentTracker;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * SegmentAdapter constructor.
      * @param VisitorInfoStorage $visitorInfoStorage
      * @param SegmentTracker $segmentTracker
-     * @param LoggerInterface $logger
      */
-    function __construct(VisitorInfoStorage $visitorInfoStorage, SegmentTracker $segmentTracker, LoggerInterface $logger) {
+    function __construct(VisitorInfoStorage $visitorInfoStorage, SegmentTracker $segmentTracker) {
         $this->visitorInfoStorage = $visitorInfoStorage;
         $this->segmentTracker = $segmentTracker;
-        $this->logger = $logger;
     }
 
     /**
