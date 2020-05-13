@@ -3,8 +3,8 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PurchaseHistoryAdapterCustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
-use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 
 class PurchaseHistoryAdapter extends AbstractAdapter
 {
@@ -15,9 +15,15 @@ class PurchaseHistoryAdapter extends AbstractAdapter
      */
     private $orderIndex;
 
-    public function __construct(OrderIndexAccessProvider $orderIndex)
+    /**
+     * @var PurchaseHistoryAdapterCustomerIdProvider
+     */
+    private $customerIdProvider;
+
+    public function __construct(OrderIndexAccessProvider $orderIndex, PurchaseHistoryAdapterCustomerIdProvider $purchaseHistoryAdapterCustomerIdProvider)
     {
         $this->orderIndex = $orderIndex;
+        $this->customerIdProvider = $purchaseHistoryAdapterCustomerIdProvider;
     }
 
     /**
@@ -28,9 +34,9 @@ class PurchaseHistoryAdapter extends AbstractAdapter
      * @param string $boostMode
      * @return array
      */
-    public function addPersonalization(array $query, float $weight = 1, string $boostMode = "multiply"): array
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
     {
-        $customerId = Factory::getInstance()->getEnvironment()->getCurrentUserId();
+        $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->orderIndex->fetchSegments($customerId);
 
         $functions = [];
