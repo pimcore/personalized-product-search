@@ -74,25 +74,3 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         return $customerInfo;
     }
 }
-
-class CustomerInfo {
-    public $customerId;
-    public $segments;
-
-    public function __construct($customerId) {
-        $this->customerId = $customerId;
-        $this->segments = [];
-    }
-};
-
-class SegmentInfo {
-
-    public $segmentId;
-    public $segmentCount;
-
-    public function __construct($segmentId, $segmentCount)
-    {
-        $this->segmentId = $segmentId;
-        $this->segmentCount = $segmentCount;
-    }
-}
