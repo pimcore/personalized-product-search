@@ -1,10 +1,11 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\tests\PersonalizedSearchBundle\ExtractTransformLoad;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests\ExtractTransformLoad;
 
+use PHPUnit\Framework\TestCase;
 
-class PurchaseHistoryProviderTest
+class PurchaseHistoryProviderTest extends TestCase
 {
-
+    
 }
