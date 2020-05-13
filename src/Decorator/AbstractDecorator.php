@@ -20,7 +20,7 @@ abstract class AbstractDecorator implements AdapterInterface
         return $this;
     }
 
-    public function addPersonalization(array $query, float $weight = 1, string $boostMode = "multiply"): array
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
     {
         foreach ($this->adapters as $adapter) {
             $query = $this->invokeAdapter($adapter, $query);

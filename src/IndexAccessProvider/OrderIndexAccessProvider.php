@@ -20,7 +20,9 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
 
     public function __construct()
     {
-        $this->esClient = ClientBuilder::create()->build();
+        if (class_exists('Elasticsearch\\ClientBuilder')) {
+            $this->esClient = ClientBuilder::create()->build();
+        }
     }
 
     /**
