@@ -4,6 +4,7 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PurchaseHistoryAdapterCustomerIdProvider as CustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
 
 class RelevantProductAdapter extends AbstractAdapter
@@ -14,9 +15,15 @@ class RelevantProductAdapter extends AbstractAdapter
      */
     private $relevantProductIndex;
 
-    public function __construct(RelevantProductIndexAccessProvider $relevantProductIndex)
+    /**
+     * @var CustomerIdProvider
+     */
+    private $customerIdProvider;
+
+    public function __construct(RelevantProductIndexAccessProvider $relevantProductIndex, CustomerIdProvider $customerIdProvider)
     {
         $this->relevantProductIndex = $relevantProductIndex;
+        $this->customerIdProvider = $customerIdProvider;
     }
 
     /**
@@ -28,7 +35,7 @@ class RelevantProductAdapter extends AbstractAdapter
      */
     public function addPersonalization(array $query, float $weight = 1, string $boostMode = "multiply"): array
     {
-        $customerId = Factory::getInstance()->getEnvironment()->getCurrentUserId();
+        $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->relevantProductIndex->fetchSegments($customerId);
 
         $functions = [];
