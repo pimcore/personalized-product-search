@@ -1,6 +1,6 @@
 <?php
 
-namespace PersonalizedSearchBundle\src\Command;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\Command;
 
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryInterface;
 use Pimcore\Console\AbstractCommand;
@@ -15,21 +15,24 @@ class ETLCommand extends AbstractCommand
 
     public function __construct(PurchaseHistoryInterface $purchaseHistory, LoggerInterface $logger)
     {
+        parent::__construct();
         $this->purchaseHistory = $purchaseHistory;
         $this->logger = $logger;
-        parent::__construct();
     }
 
     public function configure()
     {
         $this
             ->setName('personalizedsearch:start-etl')
-            ->setDescription('Manually triggers the ETL Mechanism');
+            ->setDescription('Triggers the ETL mechanism that loads the purchase history data for all users');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            $this->logger->info('Invocation of PurchaseHistory ETL started');
+            $output->writeln('Invocation of PurchaseHistory ETL started');
+
             $this->purchaseHistory->updateOrderIndexFromOrderDb();
 
             $this->logger->info('Invocation of PurchaseHistory ETL finished');

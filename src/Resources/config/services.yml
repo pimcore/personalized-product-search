@@ -23,6 +23,6 @@ services:
     # ---------------------------------------------------------
     # Register all commands of AppBundle as commands
     # ---------------------------------------------------------
-    PersonalizedSearchBundle\src\Command\:
-        resource: '../../Command'
+    Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\Command\:
+        resource: '../../ExtractTransformLoad/Command'
         tags: ['console.command']
