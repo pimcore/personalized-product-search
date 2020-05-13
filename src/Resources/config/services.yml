@@ -12,8 +12,10 @@ services:
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\SegmentAdapter: ~
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\AccessoryAdapter: ~
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\PurchaseHistoryAdapter: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductAdapter: ~
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider: ~
 
     Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface: '@AppBundle\Ecommerce\IndexService\SegmentGetter'
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider: ~
