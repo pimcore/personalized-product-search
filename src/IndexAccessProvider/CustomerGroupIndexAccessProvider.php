@@ -3,12 +3,15 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 use Elasticsearch\ClientBuilder;
+use PersonalizedSearchBundle\src\ExtractTransformLoad\CustomerGroupSegments;
+use PersonalizedSearchBundle\src\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
 
 /**
  * Class RelevantProductIndexAccessProvider
  * @package PersonalizedSearchBundle\IndexAccessProvider
  */
-class RelevantProductIndexAccessProvider implements IndexAccessProviderInterface
+class RelevantProductIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
 {
 
     private $esClient;
@@ -31,7 +34,7 @@ class RelevantProductIndexAccessProvider implements IndexAccessProviderInterface
     }
 
     /**
-     * Returns all purchase history segments of a customer
+     * Returns all purchase history segments of a customergroup
      * @param int $customerId Customer id / user id
      * @return array Segment array
      */
@@ -75,18 +78,58 @@ class RelevantProductIndexAccessProvider implements IndexAccessProviderInterface
             return [];
         }
 
-        return $response[0]['_source']['segments'];
+        return new CustomerGroupSegments($customerGroupId, $response[0]['_source']['segments']);
     }
 
-    public function index(int $documentId, object $body)
+    public function index(int $documentId, object $body) { }
+
+    public function indexByName(int $documentId, object $body, string $indexName)
     {
-        // TODO: needs to be implemented
         $params = [
-            'index' => self::$indexName,
+            'index' => $indexName,
             'type' => '_doc',
             'id' => $documentId,
             'body' => $body
         ];
         $this->esClient->index($params);
+    }
+
+    public function fetchCustomerGroupWithSegments($customerId): CustomerGroupSegments
+    {
+        // TODO: Implement fetchCustomerGroupWithSegments() method.
+    }
+
+    public function fetchCustomerGroups(): array
+    {
+        // TODO: Implement fetchCustomerGroups() method.
+    }
+
+    public function fetchCustomerGroupAssignments(): array
+    {
+        // TODO: Implement fetchCustomerGroupAssignments() method.
+    }
+
+    public function fetchCustomerGroupForCustomer($customerId): int
+    {
+        // TODO: Implement fetchCustomerGroupForCustomer() method.
+    }
+
+    public function indexCustomerGroup(CustomerGroup $customerGroup)
+    {
+        //TODO was wenn es group noch nicht gibt
+        $obj = new \stdClass();
+        $obj->customerId = $customerGroup->customerId;
+        $obj->customerGroupId = $customerGroup->customerGroupSegments->customerGroupId;
+        self::indexByName($customerGroup->customerId, $obj , self::$customerGroupIndex);
+    }
+
+    public function dropCustomerGroupIndex()
+    {
+        $this->esClient->indices()->delete(['index' => self::$customerGroupIndex]);
+    }
+
+    public function dropCustomerGroupSegmentsIndex()
+    {
+        $this->esClient->indices()->delete(['index' => self::$customerGroupSegmentIndex]);
     }
 }

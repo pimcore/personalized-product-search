@@ -4,6 +4,7 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
 
@@ -30,7 +31,7 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $this->orderIndexAccessProvider->index($customerInfo->customerId, $customerInfo);
     }
 
-    public function getPurchaseHistory(int $customerId): CustomerInfo
+    private function getPurchaseHistory(int $customerId): CustomerInfo
     {
         $orderManager = Factory::getInstance()->getOrderManager();
 
