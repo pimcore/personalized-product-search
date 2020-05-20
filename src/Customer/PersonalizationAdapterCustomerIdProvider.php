@@ -4,7 +4,7 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Customer;
 
 
-interface PurchaseHistoryAdapterCustomerIdProvider
+interface PersonalizationAdapterCustomerIdProvider
 {
     public function getCustomerId(): int;
 }

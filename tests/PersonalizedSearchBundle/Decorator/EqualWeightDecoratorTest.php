@@ -6,7 +6,7 @@ use CustomerManagementFrameworkBundle\Targeting\SegmentTracker;
 use PHPUnit\Framework\TestCase;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\PurchaseHistoryAdapter;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\SegmentAdapter;
-use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PurchaseHistoryAdapterCustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\Decorator\EqualWeightDecorator;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Targeting\VisitorInfoStorage;
@@ -106,7 +106,7 @@ class EqualWeightDecoratorTest extends TestCase
         $orderIndex->method('fetchSegments')
             ->willReturn($orderIndexResponse);
 
-        $customerIdProvider = $this->getMockBuilder(PurchaseHistoryAdapterCustomerIdProvider::class)
+        $customerIdProvider = $this->getMockBuilder(PersonalizationAdapterCustomerIdProvider::class)
             ->setMethods(['getCustomerId'])
             ->getMock();
         $customerIdProvider->method('getCustomerId')

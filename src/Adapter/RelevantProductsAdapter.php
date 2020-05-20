@@ -3,11 +3,10 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
-use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
-use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PurchaseHistoryAdapterCustomerIdProvider as CustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider as CustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
 
-class RelevantProductAdapter extends AbstractAdapter
+class RelevantProductsAdapter extends AbstractAdapter
 {
 
     /**
