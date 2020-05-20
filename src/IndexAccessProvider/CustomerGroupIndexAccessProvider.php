@@ -25,7 +25,9 @@ class RelevantProductIndexAccessProvider implements IndexAccessProviderInterface
 
     public function __construct()
     {
-        $this->esClient = ClientBuilder::create()->build();
+        if (class_exists('Elasticsearch\\ClientBuilder')) {
+            $this->esClient = ClientBuilder::create()->build();
+        }
     }
 
     /**
@@ -79,5 +81,12 @@ class RelevantProductIndexAccessProvider implements IndexAccessProviderInterface
     public function index(int $documentId, object $body)
     {
         // TODO: needs to be implemented
+        $params = [
+            'index' => self::$indexName,
+            'type' => '_doc',
+            'id' => $documentId,
+            'body' => $body
+        ];
+        $this->esClient->index($params);
     }
 }
