@@ -3,7 +3,7 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
-use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PurchaseHistoryAdapterCustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 
 class PurchaseHistoryAdapter extends AbstractAdapter
@@ -16,11 +16,11 @@ class PurchaseHistoryAdapter extends AbstractAdapter
     private $orderIndex;
 
     /**
-     * @var PurchaseHistoryAdapterCustomerIdProvider
+     * @var PersonalizationAdapterCustomerIdProvider
      */
     private $customerIdProvider;
 
-    public function __construct(OrderIndexAccessProvider $orderIndex, PurchaseHistoryAdapterCustomerIdProvider $purchaseHistoryAdapterCustomerIdProvider)
+    public function __construct(OrderIndexAccessProvider $orderIndex, PersonalizationAdapterCustomerIdProvider $purchaseHistoryAdapterCustomerIdProvider)
     {
         $this->orderIndex = $orderIndex;
         $this->customerIdProvider = $purchaseHistoryAdapterCustomerIdProvider;

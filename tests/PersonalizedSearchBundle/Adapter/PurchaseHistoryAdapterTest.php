@@ -4,7 +4,7 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests\Adapter;
 
 use PHPUnit\Framework\TestCase;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\PurchaseHistoryAdapter;
-use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PurchaseHistoryAdapterCustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 
 class PurchaseHistoryAdapterTest extends TestCase
@@ -56,7 +56,7 @@ class PurchaseHistoryAdapterTest extends TestCase
         $orderIndex->method('fetchSegments')
             ->willReturn($orderIndexResponse);
 
-        $customerIdProvider = $this->getMockBuilder(PurchaseHistoryAdapterCustomerIdProvider::class)
+        $customerIdProvider = $this->getMockBuilder(PersonalizationAdapterCustomerIdProvider::class)
             ->setMethods(['getCustomerId'])
             ->getMock();
         $customerIdProvider->method('getCustomerId')
