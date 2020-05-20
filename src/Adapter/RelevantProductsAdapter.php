@@ -32,7 +32,7 @@ class RelevantProductsAdapter extends AbstractAdapter
      * @param string $boostMode
      * @return array
      */
-    public function addPersonalization(array $query, float $weight = 1, string $boostMode = "multiply"): array
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->relevantProductIndex->fetchSegments($customerId);
