@@ -1,11 +1,9 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\src\Decorator;
-
+namespace Pimcore\Bundle\PersonalizedSearchBundle\Decorator;
 
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\AdapterInterface;
-use Pimcore\Bundle\PersonalizedSearchBundle\Decorator\AbstractDecorator;
 
 class PerformanceMeasurementDecorator extends AbstractDecorator
 {
