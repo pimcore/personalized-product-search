@@ -2,18 +2,20 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
-use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\OrderManagerInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
 
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
     private $segmentGetter;
+    private $orderManagerProvider;
     private $orderIndexAccessProvider;
 
-    public function __construct(GetterInterface $getter, OrderIndexAccessProvider $orderIndexAccessProvider) {
+    public function __construct(GetterInterface $getter, PersonalizationOrderManagerProvider $orderManagerProvider, OrderIndexAccessProvider $orderIndexAccessProvider) {
         $this->segmentGetter = $getter;
+        $this->orderManagerProvider = $orderManagerProvider;
         $this->orderIndexAccessProvider = $orderIndexAccessProvider;
     }
 
@@ -21,7 +23,7 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $customers = new DataObject\Customer\Listing();
 
         foreach($customers as $customer) {
-            $customerInfo = self::getPurchaseHistory($customer->getId());
+            $customerInfo = $this->getPurchaseHistory($customer->getId());
             $this->fillOrderIndex($customerInfo);
         }
     }
@@ -32,14 +34,12 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
 
     public function getPurchaseHistory(int $customerId): CustomerInfo
     {
-        $orderManager = Factory::getInstance()->getOrderManager();
-
+        $orderManager = $this->orderManagerProvider->getOrderManager();
         $orderList =  $orderManager->createOrderList();
         $orderQuery = $orderList->getQuery();
 
         $orderList->joinCustomer(\Pimcore\Model\DataObject\Customer::classId());
         $orderQuery->where('customer.o_id = ?', $customerId);
-
 
         $customerInfo = new CustomerInfo($customerId);
 
