@@ -3,9 +3,9 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
-use Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\OrderManagerInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
+use Pimcore\Model\DataObject\Customer;
 
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
@@ -38,7 +38,7 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $orderList =  $orderManager->createOrderList();
         $orderQuery = $orderList->getQuery();
 
-        $orderList->joinCustomer(\Pimcore\Model\DataObject\Customer::classId());
+        $orderList->joinCustomer(Customer::classId());
         $orderQuery->where('customer.o_id = ?', $customerId);
 
         $customerInfo = new CustomerInfo($customerId);
