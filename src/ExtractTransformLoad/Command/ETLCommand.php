@@ -35,6 +35,7 @@ class ETLCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         try {
+            log('test');
             $argument = $input->getArgument('option');
             switch ($argument)
             {
