@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\src\ExtractTransformLoad;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 
 class CustomerGroupSegments

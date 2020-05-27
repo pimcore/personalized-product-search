@@ -1,13 +1,13 @@
 <?php
 
 
-namespace PersonalizedSearchBundle\src\IndexAccessProvider;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 
-use PersonalizedSearchBundle\src\ExtractTransformLoad\CustomerGroupSegments;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupSegments;
 
-interface CustomerGroupIndexAccessProviderInterface extends IndexAccessProviderInterface
+interface CustomerGroupIndexAccessProviderInterface
 {
     public function fetchCustomerGroupWithSegments($customerId) : CustomerGroupSegments;
     public function fetchCustomerGroups() : array;
