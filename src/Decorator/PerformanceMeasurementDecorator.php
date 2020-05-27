@@ -13,13 +13,10 @@ class PerformanceMeasurementDecorator extends AbstractDecorator
     protected function invokeAdapter(AdapterInterface $adapter, array $query): array
     {
         $start = microtime(true);
-
-        $fp = fopen('AdapterPerformance.txt', 'a');
-
         $res = $adapter->addPersonalization($query);
-
         $time_elapsed_secs = microtime(true) - $start;
-        fwrite($fp, '\r\n' . get_class($adapter) . $time_elapsed_secs);
+
+        file_put_contents("AdapterPerformance.txt", '\r\n' . get_class($adapter) . $time_elapsed_secs, FILE_APPEND);
 
         return $res;
     }
