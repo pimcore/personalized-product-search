@@ -4,12 +4,12 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 
 use PersonalizedSearchBundle\src\ExtractTransformLoad\CustomerGroupSegments;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface;
+use PersonalizedSearchBundle\src\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
 use Pimcore\Model\DataObject;
 
-class CustomerGroupProvider implements CustomerGroupIndexAccessProviderInterface
+class CustomerGroupProvider implements CustomerGroupInterface
 {
     private $segmentGetter;
     private $customerGroupIndexAccessProvider;
@@ -44,13 +44,13 @@ class CustomerGroupProvider implements CustomerGroupIndexAccessProviderInterface
             $intersection = array_intersect($customerInfo->segments, $currentCustomerInfo->segments);
 
             if((sizeof($customerInfo->segments) * 0.6)  <= (sizeof($intersection))) {
-                $this->createCustomerGroup($this->customerGroupIndexAccessProvider->fetchCustomerGroupWithSegments($customer->getId()), $customerId, $customer->getId());
+                $this->createCustomerGroup($this->customerGroupIndexAccessProvider->fetchCustomerGroupWithSegments($customer->getId()), $customerId, $customer->getId(), $intersection);
                 return;
             }
         }
     }
 
-    private function createCustomerGroup($groupSegments, $customerId, $customerMatchedId)
+    private function createCustomerGroup($groupSegments, $customerId, $customerMatchedId, $intersection)
     {
         if($groupSegments == null) {
             $allCustomerGroups = $this->customerGroupIndexAccessProvider->fetchCustomerGroups();

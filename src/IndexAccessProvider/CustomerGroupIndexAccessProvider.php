@@ -40,6 +40,24 @@ class RelevantProductIndexAccessProvider implements CustomerGroupIndexAccessProv
      */
     public function fetchSegments(int $customerId): array
     {
+        return $this->fetchCustomerGroupWithSegments($customerId)->segments;
+    }
+
+    public function index(int $documentId, object $body) { }
+
+    public function indexByName(int $documentId, object $body, string $indexName)
+    {
+        $params = [
+            'index' => $indexName,
+            'type' => '_doc',
+            'id' => $documentId,
+            'body' => $body
+        ];
+        $this->esClient->index($params);
+    }
+
+    public function fetchCustomerGroupWithSegments($customerId): CustomerGroupSegments
+    {
         $params = [
             'index' => self::$customerGroupIndex,
             'type' => '_doc',
@@ -55,7 +73,7 @@ class RelevantProductIndexAccessProvider implements CustomerGroupIndexAccessProv
         $response = $this->esClient->search($params)['hits']['hits'];
 
         if(sizeof($response) === 0) {
-            return [];
+            return null;
         }
 
         $customerGroupId = $response[0]['_source']['customerGroupId'];
@@ -75,51 +93,57 @@ class RelevantProductIndexAccessProvider implements CustomerGroupIndexAccessProv
         $response = $this->esClient->search($params)['hits']['hits'];
 
         if(sizeof($response) === 0) {
-            return [];
+            return null;
         }
 
         return new CustomerGroupSegments($customerGroupId, $response[0]['_source']['segments']);
     }
 
-    public function index(int $documentId, object $body) { }
-
-    public function indexByName(int $documentId, object $body, string $indexName)
-    {
-        $params = [
-            'index' => $indexName,
-            'type' => '_doc',
-            'id' => $documentId,
-            'body' => $body
-        ];
-        $this->esClient->index($params);
-    }
-
-    public function fetchCustomerGroupWithSegments($customerId): CustomerGroupSegments
-    {
-        // TODO: Implement fetchCustomerGroupWithSegments() method.
-    }
-
     public function fetchCustomerGroups(): array
     {
-        // TODO: Implement fetchCustomerGroups() method.
+        $params = [
+            'index' => self::$customerGroupSegmentsIndex,
+            'type' => '_doc'
+        ];
+        $response = $this->esClient->getSource($params);
+
+        foreach ($response as $value) {
+            $customerGroups[] = $value['customerGroupId'];
+        }
+
+        return array_map(function($entry){
+            return $entry['customerGroupId'];
+        }, $response);
+
     }
 
     public function fetchCustomerGroupAssignments(): array
     {
-        // TODO: Implement fetchCustomerGroupAssignments() method.
+        $params = [
+            'index' => self::$customerGroupIndex,
+            'type' => '_doc'
+        ];
+        $response = $this->esClient->getSource($params);
+
+        return array_map(function($entry){
+            return new CustomerGroup($entry['customerId'], $entry['customerGroupId']);
+        }, $response);
     }
 
     public function fetchCustomerGroupForCustomer($customerId): int
     {
-        // TODO: Implement fetchCustomerGroupForCustomer() method.
+        return $this->fetchCustomerGroupWithSegments($customerId)->customerGroupId;
     }
 
     public function indexCustomerGroup(CustomerGroup $customerGroup)
     {
-        //TODO was wenn es group noch nicht gibt
         $obj = new \stdClass();
         $obj->customerId = $customerGroup->customerId;
         $obj->customerGroupId = $customerGroup->customerGroupSegments->customerGroupId;
+        if(!customerGroupExists($customerGroup->customerGroupSegments->customerGroupId))
+        {
+            self::indexByName($customerGroup->customerGroupSegments->customerGroupId, $customerGroup->customerGroupSegments, self::$customerGroupSegmentIndex);
+        }
         self::indexByName($customerGroup->customerId, $obj , self::$customerGroupIndex);
     }
 
@@ -131,5 +155,25 @@ class RelevantProductIndexAccessProvider implements CustomerGroupIndexAccessProv
     public function dropCustomerGroupSegmentsIndex()
     {
         $this->esClient->indices()->delete(['index' => self::$customerGroupSegmentIndex]);
+    }
+
+
+    private function customerGroupExists($customerGroupId)
+    {
+        $params = [
+            'index' => self::$customerGroupSegmentIndex,
+            'type' => '_doc',
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'customerGroupId' => $customerGroupId
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->esClient->search($params)['hits']['hits'];
+
+        return sizeof($response) === 0 ? false : true;
     }
 }
