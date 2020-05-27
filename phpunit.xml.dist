@@ -10,6 +10,12 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
+            <exclude>
+                <directory suffix=".php">src/DependencyInjection</directory>
+                <file>src/PersonalizedSearchBundle.php</file>
+                <directory suffix=".php">src/tests</directory>
+                <directory suffix=".php">src/ExtractTransformLoad/Command</directory>
+            </exclude>
         </whitelist>
     </filter>
 

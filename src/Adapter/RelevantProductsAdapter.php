@@ -3,30 +3,30 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
-use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider as CustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
 
-class PurchaseHistoryAdapter extends AbstractAdapter
+class RelevantProductsAdapter extends AbstractAdapter
 {
-    /**
-     * @var OrderIndexAccessProvider
-     */
-    private $orderIndex;
 
     /**
-     * @var PersonalizationAdapterCustomerIdProvider
+     * @var RelevantProductIndexAccessProvider
+     */
+    private $relevantProductIndex;
+
+    /**
+     * @var CustomerIdProvider
      */
     private $customerIdProvider;
 
-    public function __construct(OrderIndexAccessProvider $orderIndex, PersonalizationAdapterCustomerIdProvider $purchaseHistoryAdapterCustomerIdProvider)
+    public function __construct(RelevantProductIndexAccessProvider $relevantProductIndex, CustomerIdProvider $customerIdProvider)
     {
-        $this->orderIndex = $orderIndex;
-        $this->customerIdProvider = $purchaseHistoryAdapterCustomerIdProvider;
+        $this->relevantProductIndex = $relevantProductIndex;
+        $this->customerIdProvider = $customerIdProvider;
     }
 
     /**
-     * Boosts accessory parts more than cars
-     * WARNING: this is a not generic adapter and is specific to the demo app
+     * Boosts products based on preferences of similar customers
      * @param array $query
      * @param float $weight
      * @param string $boostMode
@@ -35,7 +35,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
     public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
-        $response = $this->orderIndex->fetchSegments($customerId);
+        $response = $this->relevantProductIndex->fetchSegments($customerId);
 
         $functions = [];
 
@@ -53,7 +53,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
             return $query;
         }
 
-        $purchaseHistoryQuery = [
+        $relevantProductQuery = [
             'function_score' => [
                 'query' => $query,
                 'functions' => $functions,
@@ -61,6 +61,6 @@ class PurchaseHistoryAdapter extends AbstractAdapter
             ]
         ];
 
-        return $purchaseHistoryQuery;
+        return $relevantProductQuery;
     }
 }

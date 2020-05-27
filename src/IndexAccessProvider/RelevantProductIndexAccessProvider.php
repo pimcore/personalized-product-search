@@ -5,10 +5,10 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 use Elasticsearch\ClientBuilder;
 
 /**
- * Class OrderIndexAccessProvider
+ * Class RelevantProductIndexAccessProvider
  * @package PersonalizedSearchBundle\IndexAccessProvider
  */
-class OrderIndexAccessProvider implements IndexAccessProviderInterface
+class RelevantProductIndexAccessProvider implements IndexAccessProviderInterface
 {
 
     private $esClient;
@@ -16,7 +16,12 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
     /**
      * @var string
      */
-    private static $indexName = 'order_segments';
+    private static $customerGroupIndex = 'customergroup';
+
+    /**
+     * @var string
+     */
+    private static $customerGroupSegmentIndex = 'customergroup_segments';
 
     public function __construct()
     {
@@ -33,7 +38,7 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
     public function fetchSegments(int $customerId): array
     {
         $params = [
-            'index' => self::$indexName,
+            'index' => self::$customerGroupIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -50,17 +55,31 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
             return [];
         }
 
+        $customerGroupId = $response[0]['_source']['customerGroupId'];
+
+        $params = [
+            'index' => self::$customerGroupSegmentIndex,
+            'type' => '_doc',
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'customerGroupId' => $customerGroupId
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->esClient->search($params)['hits']['hits'];
+
+        if(sizeof($response) === 0) {
+            return [];
+        }
+
         return $response[0]['_source']['segments'];
     }
 
     public function index(int $documentId, object $body)
     {
-        $params = [
-            'index' => self::$indexName,
-            'type' => '_doc',
-            'id' => $documentId,
-            'body' => $body
-        ];
-        $this->esClient->index($params);
+        // TODO: needs to be implemented
     }
 }
