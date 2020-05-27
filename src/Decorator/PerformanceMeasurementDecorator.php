@@ -16,7 +16,7 @@ class PerformanceMeasurementDecorator extends AbstractDecorator
         $res = $adapter->addPersonalization($query);
         $time_elapsed_secs = microtime(true) - $start;
 
-        file_put_contents("AdapterPerformance.txt", '\r\n' . get_class($adapter) . $time_elapsed_secs, FILE_APPEND);
+        file_put_contents("/home/pimcoredemo/AdapterPerformance.txt", "\r\n" . get_class($adapter) . ": " . $time_elapsed_secs * 1000 . "ms", FILE_APPEND);
 
         return $res;
     }
