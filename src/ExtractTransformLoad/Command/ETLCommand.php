@@ -35,7 +35,6 @@ class ETLCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            log('test');
             $argument = $input->getArgument('option');
             switch ($argument)
             {
@@ -57,8 +56,8 @@ class ETLCommand extends AbstractCommand
                     break;
             }
         } catch (\Exception $exception) {
-            $this->logger->error('Invocation of PurchaseHistory ETL failed with message: ' . $exception->getMessage());
-            $output->writeln('Invocation of PurchaseHistory ETL failed with message: ' . $exception->getMessage());
+            $this->logger->error('Invocation of ETL failed with message: ' . $exception->getMessage());
+            $output->writeln('Invocation of ETL failed with message: ' . $exception->getMessage());
         }
     }
 

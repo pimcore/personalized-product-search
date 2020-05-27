@@ -55,7 +55,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         $this->esClient->index($params);
     }
 
-    public function fetchCustomerGroupWithSegments($customerId): CustomerGroupSegments
+    public function fetchCustomerGroupWithSegments($customerId) : ?CustomerGroupSegments
     {
         $params = [
             'index' => self::$customerGroupIndex,
@@ -101,17 +101,22 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
     public function fetchCustomerGroups(): array
     {
         $params = [
-            'index' => self::$customerGroupSegmentsIndex,
-            'type' => '_doc'
+            'index' => self::$customerGroupSegmentIndex,
+            'type' => '_doc',
+            'body' => [
+                'query' => [
+                    'match_all' => (object) []
+                ]
+            ]
         ];
-        $response = $this->esClient->getSource($params);
+        $response = $this->esClient->search($params)['hits']['hits'];
 
         foreach ($response as $value) {
             $customerGroups[] = $value['customerGroupId'];
         }
 
         return array_map(function($entry){
-            return $entry['customerGroupId'];
+            return $entry['_source']['segments']['customerGroupId'];
         }, $response);
 
     }
@@ -139,7 +144,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         $obj = new \stdClass();
         $obj->customerId = $customerGroup->customerId;
         $obj->customerGroupId = $customerGroup->customerGroupSegments->customerGroupId;
-        if(!customerGroupExists($customerGroup->customerGroupSegments->customerGroupId))
+        if(!$this->customerGroupExists($customerGroup->customerGroupSegments->customerGroupId))
         {
             self::indexByName($customerGroup->customerGroupSegments->customerGroupId, $customerGroup->customerGroupSegments, self::$customerGroupSegmentIndex);
         }
@@ -148,12 +153,14 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
 
     public function dropCustomerGroupIndex()
     {
-        $this->esClient->indices()->delete(['index' => self::$customerGroupIndex]);
+        if($this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
+            $this->esClient->indices()->delete(['index' => self::$customerGroupIndex]);
     }
 
     public function dropCustomerGroupSegmentsIndex()
     {
-        $this->esClient->indices()->delete(['index' => self::$customerGroupSegmentIndex]);
+        if($this->esClient->indices()->exists(['index' => self::$customerGroupSegmentIndex]))
+            $this->esClient->indices()->delete(['index' => self::$customerGroupSegmentIndex]);
     }
 
 
@@ -174,5 +181,17 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         $response = $this->esClient->search($params)['hits']['hits'];
 
         return sizeof($response) === 0 ? false : true;
+    }
+
+    public function createCustomerGroupIndex()
+    {
+        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
+            $this->esClient->indices()->create(['index' => self::$customerGroupIndex]);
+    }
+
+    public function createCustomerGroupSegmentsIndex()
+    {
+        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupSegmentIndex]))
+            $this->esClient->indices()->create(['index' => self::$customerGroupSegmentIndex]);
     }
 }

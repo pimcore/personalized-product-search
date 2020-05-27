@@ -9,11 +9,13 @@ use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupSe
 
 interface CustomerGroupIndexAccessProviderInterface
 {
-    public function fetchCustomerGroupWithSegments($customerId) : CustomerGroupSegments;
+    public function fetchCustomerGroupWithSegments($customerId): ?CustomerGroupSegments;
     public function fetchCustomerGroups() : array;
     public function fetchCustomerGroupAssignments(): array;
     public function fetchCustomerGroupForCustomer($customerId): int;
     public function indexCustomerGroup(CustomerGroup $customerGroup);
     public function dropCustomerGroupIndex();
     public function dropCustomerGroupSegmentsIndex();
+    public function createCustomerGroupIndex();
+    public function createCustomerGroupSegmentsIndex();
 }
