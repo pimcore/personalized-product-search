@@ -3,10 +3,9 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 
-use PersonalizedSearchBundle\src\ExtractTransformLoad\CustomerGroupSegments;
-use PersonalizedSearchBundle\src\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 use Pimcore\Model\DataObject;
 
 class CustomerGroupProvider implements CustomerGroupInterface
@@ -16,7 +15,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
 
     public function __construct(GetterInterface $getter, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
         $this->segmentGetter = $getter;
-        $this->$customerGroupIndexAccessProvider = $customerGroupIndexAccessProvider;
+        $this->customerGroupIndexAccessProvider = $customerGroupIndexAccessProvider;
     }
 
     public function updateCustomerGroupAndSegmentsIndicesFromOrderDb()
@@ -27,7 +26,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
         $this->customerGroupIndexAccessProvider->dropCustomerGroupIndex();
 
         foreach($customers as $customer) {
-            assignCustomerToCustomerGroup($customer->getId());
+            $this->assignCustomerToCustomerGroup($customer->getId());
         }
 
     }

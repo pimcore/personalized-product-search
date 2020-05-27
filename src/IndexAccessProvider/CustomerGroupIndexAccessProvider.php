@@ -3,15 +3,14 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 use Elasticsearch\ClientBuilder;
-use PersonalizedSearchBundle\src\ExtractTransformLoad\CustomerGroupSegments;
-use PersonalizedSearchBundle\src\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupSegments;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
 
 /**
  * Class RelevantProductIndexAccessProvider
  * @package PersonalizedSearchBundle\IndexAccessProvider
  */
-class RelevantProductIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
+class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
 {
 
     private $esClient;

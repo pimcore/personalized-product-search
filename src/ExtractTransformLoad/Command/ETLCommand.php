@@ -6,6 +6,7 @@ use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupIn
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryInterface;
 use Pimcore\Console\AbstractCommand;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -29,9 +30,8 @@ class ETLCommand extends AbstractCommand
             ->setName('personalizedsearch:start-etl')
             ->setDescription('Triggers the ETL mechanism that loads the purchase history data for all users')
             ->addArgument('option', InputArgument::OPTIONAL, 'Invoke PurchaseHistory or CustomerGroup seperately');
-
     }
- //bin/console personalized:start-etl
+
     public function execute(InputInterface $input, OutputInterface $output)
     {
         try {
@@ -39,20 +39,20 @@ class ETLCommand extends AbstractCommand
             switch ($argument)
             {
                 case 'PurchaseHistory':
-                    log('PurchaseHistory Invocation started');
+                    $this->log('PurchaseHistory Invocation started', $output);
                     $this->purchaseHistory->updateOrderIndexFromOrderDb();
-                    log('PurchaseHistory Invocation finished');
+                    $this->log('PurchaseHistory Invocation finished', $output);
                     break;
                 case 'CustomerGroup':
-                    log('CustomerGroup Invocation started');
+                    $this->log('CustomerGroup Invocation started', $output);
                     $this->customerGroup->updateCustomerGroupAndSegmentsIndicesFromOrderDb();
-                    log('CustomerGroup Invocation finished');
+                    $this->log('CustomerGroup Invocation finished', $output);
                     break;
                 default:
-                    log('ETL full Invocation started');
+                    $this->log('ETL full Invocation started', $output);
                     $this->purchaseHistory->updateOrderIndexFromOrderDb();
                     $this->customerGroup->updateCustomerGroupAndSegmentsIndicesFromOrderDb();
-                    log('ETL full Invocation finished');
+                    $this->log('ETL full Invocation finished', $output);
                     break;
             }
         } catch (\Exception $exception) {
