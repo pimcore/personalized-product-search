@@ -6,18 +6,6 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\Decorator;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\AdapterInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\AdapterPerformanceIndexAccessProvider;
 
-class PerformanceInfo
-{
-    public $adapterName;
-    public $elapsedTime;
-
-    public function __construct($adapterName, $elapsedTime)
-    {
-        $this->adapterName = $adapterName;
-        $this->elapsedTime = $elapsedTime;
-    }
-}
-
 class PerformanceMeasurementDecorator extends AbstractDecorator
 {
     const FILE_NAME = "/home/pimcoredemo/AdapterPerformance.txt";
@@ -28,8 +16,8 @@ class PerformanceMeasurementDecorator extends AbstractDecorator
     private $adapterPerformanceIndex;
 
     function __construct(AdapterPerformanceIndexAccessProvider $adapterPerformanceIndex) {
-        $this->adapterPerformanceIndex = $adapterPerformanceIndex;
         parent::__construct();
+        $this->adapterPerformanceIndex = $adapterPerformanceIndex;
 //        file_put_contents(self::FILE_NAME, "-----------------------------------------\r\n", FILE_APPEND);
     }
 
