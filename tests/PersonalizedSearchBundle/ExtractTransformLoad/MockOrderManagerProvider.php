@@ -21,4 +21,9 @@ class MockOrderManagerProvider implements PersonalizationOrderManagerProvider
     {
         return $this->orderManager;
     }
+
+    function getCustomerClassId(): string
+    {
+        return "CU";
+    }
 }
