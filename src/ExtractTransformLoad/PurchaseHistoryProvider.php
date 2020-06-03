@@ -5,7 +5,6 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
-use Pimcore\Model\DataObject\Customer;
 
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
@@ -38,14 +37,14 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $orderList =  $orderManager->createOrderList();
         $orderQuery = $orderList->getQuery();
 
-        $orderList->joinCustomer(Customer::classId());
+        $orderList->joinCustomer($this->orderManagerProvider->getCustomerClassId());
         $orderQuery->where('customer.o_id = ?', $customerId);
 
         $customerInfo = new CustomerInfo($customerId);
 
-        foreach($orderList as $order)
+        foreach ($orderList as $order)
         {
-            foreach($order->getItems() as $item)
+            foreach ($order->getItems() as $item)
             {
                 $product = $item->getProduct();
 
@@ -55,16 +54,17 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
                 {
                     $segmentId = $segment->getId();
                     $found = false;
-                    foreach($customerInfo->segments as $e)
+                    foreach ($customerInfo->segments as $element)
                     {
-                        if($e->segmentId === $segmentId)
+                        if ($element->segmentId === $segmentId)
                         {
-                            $e->segmentCount++;
+                            $element->segmentCount++;
                             $found = true;
                         }
                     }
 
-                    if(!$found){
+                    if(!$found)
+                    {
                         $segmentInfo = new SegmentInfo($segmentId, 1);
                         $customerInfo->segments[] = $segmentInfo;
                     }
