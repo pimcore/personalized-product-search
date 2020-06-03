@@ -12,6 +12,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
 {
     private $segmentGetter;
     private $customerGroupIndexAccessProvider;
+    private const PROCENTUAL_INTERSECTION = 0.4;
 
     public function __construct(GetterInterface $getter, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
         $this->segmentGetter = $getter;
@@ -36,8 +37,13 @@ class CustomerGroupProvider implements CustomerGroupInterface
 
     private function assignCustomerToCustomerGroup(int $customerId)
     {
+        $customerHasGroup = false;
         $customers = new DataObject\Customer\Listing();
         $customerInfo = self::getPurchaseHistory($customerId);
+
+        $customerInfoSegmentIds = array_map(function ($entry) {
+            return $entry->segmentId;
+        }, $customerInfo->segments);
 
         foreach ($customers as $customer)
         {
@@ -45,40 +51,40 @@ class CustomerGroupProvider implements CustomerGroupInterface
                 continue;
 
             $currentCustomerInfo = self::getPurchaseHistory($customer->getId());
-            $customerInfoSegmentIds = array_map(function ($entry) {
-                return $entry->segmentId;
-            }, $customerInfo->segments);
+
             $currentCustomerInfoSegmentIds = array_map(function ($entry) {
                 return $entry->segmentId;
             }, $currentCustomerInfo->segments);
             $intersection = array_intersect($customerInfoSegmentIds, $currentCustomerInfoSegmentIds);
 
-            //TODO: 3 fälle, neue gruppe anlegen, gruppe zuweisen, oder auslassen ( wenn segmente des customer leer sind)
-            //TODO: intersection prozente in relation zur gesamtlänge beider customer und nicht nur von einem
-
             $createNewGroup = $this->handleIntersectionValue($intersection, $customerInfoSegmentIds, $currentCustomerInfoSegmentIds);
 
-            if ((sizeof($customerInfo->segments) * 0.6) <= (sizeof($intersection)))
+            if ($createNewGroup)
             {
-                {
-                    $this->createCustomerGroup($this->customerGroupIndexAccessProvider->fetchCustomerGroupWithSegments($customer->getId()), $customerId, $customer->getId(), $intersection);
-                    return;
-                }
+                $this->createCustomerGroup($this->customerGroupIndexAccessProvider->fetchCustomerGroupWithSegments($customer->getId()), $customerId, $intersection);
+                $customerHasGroup = true;
+                break;
             }
         }
+
+        if(!$customerHasGroup && sizeof($customerInfoSegmentIds) > 0)
+            $this->createCustomerGroup($this->customerGroupIndexAccessProvider->fetchCustomerGroupWithSegments($customerId), $customerId, $customerInfoSegmentIds);
     }
 
-    private function handleIntersectionValue($intersection)
+    private function handleIntersectionValue($intersection, $customerInfoSegmentIds, $currentCustomerInfoSegmentIds)
     {
-        $returnValue = false;
+        $createNewGroup = true;
+
         if(sizeof($intersection) === 0)
-            $returnValue = true;
+            $createNewGroup = false;
+        if(((sizeof($customerInfoSegmentIds) * self::PROCENTUAL_INTERSECTION) > sizeof($intersection))
+            || (sizeof($currentCustomerInfoSegmentIds) * self::PROCENTUAL_INTERSECTION) > sizeof($intersection))
+            $createNewGroup = false;
 
-        //TODO: spezialfälle ergänzen, ob neue gruppe angelegt werden soll oder nicht
-
+        return $createNewGroup;
     }
 
-    private function createCustomerGroup($groupSegments, $customerId, $customerMatchedId, $intersection)
+    private function createCustomerGroup($groupSegments, $customerId, $intersection)
     {
         if($groupSegments == null) {
             $allCustomerGroups = $this->customerGroupIndexAccessProvider->fetchCustomerGroups();
