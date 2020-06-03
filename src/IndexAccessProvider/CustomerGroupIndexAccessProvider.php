@@ -3,8 +3,9 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 use Elasticsearch\ClientBuilder;
-use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupSegments;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupAssignment;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentInfo;
 
 /**
  * Class RelevantProductIndexAccessProvider
@@ -12,18 +13,17 @@ use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
  */
 class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
 {
-
     private $esClient;
 
     /**
      * @var string
      */
-    private static $customerGroupIndex = 'customergroup';
+    private static $customerGroupAssignmentIndex = 'customergroup';
 
     /**
      * @var string
      */
-    private static $customerGroupSegmentIndex = 'customergroup_segments';
+    private static $customerGroupIndex = 'customergroup_segments';
 
     public function __construct()
     {
@@ -32,7 +32,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         }
     }
 
-    public function indexByName(int $documentId, object $body, string $indexName)
+    private function indexByName(int $documentId, object $body, string $indexName)
     {
         $params = [
             'index' => $indexName,
@@ -43,10 +43,10 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         $this->esClient->index($params);
     }
 
-    public function fetchCustomerGroupSegments(): array
+    public function fetchCustomerGroups(): array
     {
         $params = [
-            'index' => self::$customerGroupSegmentIndex,
+            'index' => self::$customerGroupIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -59,28 +59,33 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         $customerGroupSegments = [];
 
         foreach ($response as $value) {
-            $customerGroupSegments[] = new CustomerGroupSegments($value['_source']['customerGroupId'], $value['_source']['segments']);
+            $segmentInfos = array_map(function ($entry) {
+                return new SegmentInfo($entry['segmentId'], $entry['segmentCount']);
+            }, $value['_source']['segments']);
+
+            $customerGroupSegments[] = new CustomerGroup($value['_source']['customerGroupId'], $segmentInfos);
         }
 
         return $customerGroupSegments;
     }
 
-    public function indexCustomerGroup(CustomerGroup $customerGroup)
+    public function indexCustomerGroupAssignment(CustomerGroupAssignment $customerGroupAssignment)
     {
         $obj = new \stdClass();
-        $obj->customerId = $customerGroup->customerId;
-        $obj->customerGroupId = $customerGroup->customerGroupSegments->customerGroupId;
-        if(!$this->customerGroupExists($customerGroup->customerGroupSegments->customerGroupId))
+        $obj->customerId = $customerGroupAssignment->customerId;
+        $obj->customerGroupId = $customerGroupAssignment->customerGroup->customerGroupId;
+        if(!$this->customerGroupExists($customerGroupAssignment->customerGroup->customerGroupId))
         {
-            self::indexByName($customerGroup->customerGroupSegments->customerGroupId, $customerGroup->customerGroupSegments, self::$customerGroupSegmentIndex);
+            // create new group if it doesn't exist already
+            self::indexByName($customerGroupAssignment->customerGroup->customerGroupId, $customerGroupAssignment->customerGroup, self::$customerGroupIndex);
         }
-        self::indexByName($customerGroup->customerId, $obj , self::$customerGroupIndex);
+        self::indexByName($customerGroupAssignment->customerId, $obj , self::$customerGroupAssignmentIndex);
     }
 
     private function customerGroupExists($customerGroupId)
     {
         $params = [
-            'index' => self::$customerGroupSegmentIndex,
+            'index' => self::$customerGroupIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -96,27 +101,27 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         return sizeof($response) === 0 ? false : true;
     }
 
+    public function dropCustomerGroupAssignmentIndex()
+    {
+        if($this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex]))
+            $this->esClient->indices()->delete(['index' => self::$customerGroupAssignmentIndex]);
+    }
+
     public function dropCustomerGroupIndex()
     {
         if($this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
             $this->esClient->indices()->delete(['index' => self::$customerGroupIndex]);
     }
 
-    public function dropCustomerGroupSegmentsIndex()
+    public function createCustomerGroupAssignmentIndex()
     {
-        if($this->esClient->indices()->exists(['index' => self::$customerGroupSegmentIndex]))
-            $this->esClient->indices()->delete(['index' => self::$customerGroupSegmentIndex]);
+        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex]))
+            $this->esClient->indices()->create(['index' => self::$customerGroupAssignmentIndex]);
     }
 
     public function createCustomerGroupIndex()
     {
         if(!$this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
             $this->esClient->indices()->create(['index' => self::$customerGroupIndex]);
-    }
-
-    public function createCustomerGroupSegmentsIndex()
-    {
-        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupSegmentIndex]))
-            $this->esClient->indices()->create(['index' => self::$customerGroupSegmentIndex]);
     }
 }

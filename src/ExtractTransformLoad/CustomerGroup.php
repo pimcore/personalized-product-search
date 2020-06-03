@@ -6,12 +6,12 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 class CustomerGroup
 {
-    public $customerId;
-    public $customerGroupSegments;
+    public $customerGroupId;
+    public $segments;
 
-    public function __construct($id, CustomerGroupSegments $customerGroupSegments)
+    public function __construct(int $id, array $segmentInfos)
     {
-        $this->customerId = $id;
-        $this->customerGroupSegments = $customerGroupSegments;
+        $this->customerGroupId = $id;
+        $this->segments = $segmentInfos;
     }
 }

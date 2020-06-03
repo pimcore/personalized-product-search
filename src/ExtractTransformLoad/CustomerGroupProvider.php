@@ -12,7 +12,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
 {
     private $segmentGetter;
     private $customerGroupIndexAccessProvider;
-    private const PROCENTUAL_INTERSECTION = 0.4;
+    private const PROCENTUAL_INTERSECTION = 0.3;
 
     public function __construct(GetterInterface $getter, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
         $this->segmentGetter = $getter;
@@ -23,11 +23,11 @@ class CustomerGroupProvider implements CustomerGroupInterface
     {
         $customers = new DataObject\Customer\Listing();
 
-        $this->customerGroupIndexAccessProvider->dropCustomerGroupSegmentsIndex();
         $this->customerGroupIndexAccessProvider->dropCustomerGroupIndex();
+        $this->customerGroupIndexAccessProvider->dropCustomerGroupAssignmentIndex();
 
+        $this->customerGroupIndexAccessProvider->createCustomerGroupAssignmentIndex();
         $this->customerGroupIndexAccessProvider->createCustomerGroupIndex();
-        $this->customerGroupIndexAccessProvider->createCustomerGroupSegmentsIndex();
 
         foreach($customers as $customer) {
             $this->assignCustomerToCustomerGroup($customer->getId());
@@ -42,18 +42,23 @@ class CustomerGroupProvider implements CustomerGroupInterface
             return $entry->segmentId;
         }, $customerInfo->segments);
 
-        $allCustomerGroupSegments = $this->customerGroupIndexAccessProvider->fetchCustomerGroupSegments();
+        $allCustomerGroups = $this->customerGroupIndexAccessProvider->fetchCustomerGroups();
         $isAssigned = false;
 
-        foreach ($allCustomerGroupSegments as $customerGroupSegment) {
-            $customerGroupSegments = $customerGroupSegment->segments;
-            $intersection = array_intersect($customerInfoSegmentIds, $customerGroupSegments);
+        foreach ($allCustomerGroups as $customerGroup) {
+            $customerGroupSegmentIds = array_map(function ($entry) {
+                return $entry->segmentId;
+            }, $customerGroup->segments);
 
+            $intersection = array_intersect($customerInfoSegmentIds, $customerGroupSegmentIds);
+
+            // todo: check if condition
             if (sizeof($customerInfoSegmentIds) * self::PROCENTUAL_INTERSECTION < sizeof($intersection)
-                && sizeof($customerGroupSegments) * self::PROCENTUAL_INTERSECTION < sizeof($intersection))
+                && sizeof($customerGroupSegmentIds) * self::PROCENTUAL_INTERSECTION < sizeof($intersection))
             {
-                $customerGroup = new CustomerGroup($customerId, $customerGroupSegment);
-                $this->customerGroupIndexAccessProvider->indexCustomerGroup($customerGroup);
+                // assign to existing group
+                $customerGroupAssignment = new CustomerGroupAssignment($customerId, $customerGroup);
+                $this->customerGroupIndexAccessProvider->indexCustomerGroupAssignment($customerGroupAssignment);
 
                 $isAssigned = true;
             }
@@ -62,11 +67,14 @@ class CustomerGroupProvider implements CustomerGroupInterface
         if (!$isAssigned && sizeof($customerInfoSegmentIds) > 0) {
             // create new group
             $newId = 1;
-            if(sizeof($allCustomerGroupSegments) > 0)
-                $newId = max(array_map(function($customerGroups) { return $customerGroups->customerGroupId; }, $allCustomerGroupSegments)) + 1;
+            if(sizeof($allCustomerGroups) > 0) {
+                $newId = max(array_map(function ($customerGroups) {
+                        return $customerGroups->customerGroupId;
+                    }, $allCustomerGroups)) + 1;
+            }
 
-            $customerGroup = new CustomerGroup($customerId, new CustomerGroupSegments($newId, $customerInfoSegmentIds));
-            $this->customerGroupIndexAccessProvider->indexCustomerGroup($customerGroup);
+            $customerGroupAssignment = new CustomerGroupAssignment($customerId, new CustomerGroup($newId, $customerInfo->segments));
+            $this->customerGroupIndexAccessProvider->indexCustomerGroupAssignment($customerGroupAssignment);
         }
     }
 

@@ -4,15 +4,14 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 
-use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
-use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupSegments;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupAssignment;
 
 interface CustomerGroupIndexAccessProviderInterface
 {
-    public function fetchCustomerGroupSegments(): array;
-    public function indexCustomerGroup(CustomerGroup $customerGroup);
+    public function fetchCustomerGroups(): array;
+    public function indexCustomerGroupAssignment(CustomerGroupAssignment $customerGroupAssignment);
+    public function dropCustomerGroupAssignmentIndex();
     public function dropCustomerGroupIndex();
-    public function dropCustomerGroupSegmentsIndex();
+    public function createCustomerGroupAssignmentIndex();
     public function createCustomerGroupIndex();
-    public function createCustomerGroupSegmentsIndex();
 }
