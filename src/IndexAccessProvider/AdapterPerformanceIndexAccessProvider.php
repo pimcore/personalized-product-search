@@ -4,8 +4,6 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 use Elasticsearch\ClientBuilder;
-use Sabre\DAV\Exception\NotImplemented;
-use Symfony\Component\Intl\Exception\NotImplementedException;
 
 /**
  * Class AdapterPerformanceIndexAccessProvider
@@ -29,7 +27,7 @@ class AdapterPerformanceIndexAccessProvider implements IndexAccessProviderInterf
 
     public function fetchSegments(int $customerId): array
     {
-        throwException(new NotImplementedException("Currently not implemented"));
+        return [];
     }
 
 
