@@ -37,4 +37,32 @@ class AccessoryAdapter extends AbstractAdapter
 
         return $accessoryQuery;
     }
+
+    /**
+     * Get boosting values
+     * @param float $weight
+     * @param string $boostMode
+     * @return array
+     */
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    {
+        $functions = [
+            [
+                'segmentId' => 970,
+                'weight' => 1000
+            ],
+            [
+                'segmentId' => 980,
+                'weight' => 1
+            ]
+        ];
+
+        $info = [
+            'adapter' => get_class($this),
+            'boostMode' => $boostMode,
+            'segments' => $functions
+        ];
+
+        return $info;
+    }
 }

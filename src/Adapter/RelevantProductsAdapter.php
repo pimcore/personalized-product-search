@@ -63,4 +63,33 @@ class RelevantProductsAdapter extends AbstractAdapter
 
         return $relevantProductQuery;
     }
+
+    /**
+     * Get boosting values
+     * @param float $weight
+     * @param string $boostMode
+     * @return array
+     */
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    {
+        $customerId = $this->customerIdProvider->getCustomerId();
+        $response = $this->relevantProductIndex->fetchSegments($customerId);
+
+        $info = [
+            'adapter' => get_class($this),
+            'boostMode' => $boostMode,
+            'segments' => []
+        ];
+
+        foreach($response as $segment) {
+            $segmentId = $segment['segmentId'];
+            $segmentCount = $segment['segmentCount'];
+            $info['segments'] = [
+                'segmentId' => $segmentId,
+                'weight' => $segmentCount * $weight
+            ];
+        }
+
+        return $info;
+    }
 }
