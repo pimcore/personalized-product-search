@@ -8,6 +8,7 @@ use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductI
 
 class RelevantProductsAdapter extends AbstractAdapter
 {
+    private static $ADDITIONAL_WEIGHT = 8;
 
     /**
      * @var RelevantProductIndexAccessProvider
@@ -32,7 +33,7 @@ class RelevantProductsAdapter extends AbstractAdapter
      * @param string $boostMode
      * @return array
      */
-    public function addPersonalization(array $query, float $weight = 1, string $boostMode = "multiply"): array
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->relevantProductIndex->fetchSegments($customerId);
@@ -45,7 +46,7 @@ class RelevantProductsAdapter extends AbstractAdapter
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight
+                'weight' => $segmentCount * $weight * RelevantProductsAdapter::$ADDITIONAL_WEIGHT
             ];
         }
 

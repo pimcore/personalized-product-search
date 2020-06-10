@@ -15,6 +15,7 @@ services:
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductsAdapter: ~
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider'
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider: ~
@@ -26,6 +27,9 @@ services:
 
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupProvider'
+
+    Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProviderImpl: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProvider: '@Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProviderImpl'
 
     # ---------------------------------------------------------
     # Register all commands of AppBundle as commands

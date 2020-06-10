@@ -2,7 +2,6 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
-use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
@@ -11,10 +10,12 @@ use Pimcore\Model\DataObject;
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
     private $segmentGetter;
+    private $orderManagerProvider;
     private $orderIndexAccessProvider;
 
-    public function __construct(GetterInterface $getter, OrderIndexAccessProvider $orderIndexAccessProvider) {
+    public function __construct(GetterInterface $getter, PersonalizationOrderManagerProvider $orderManagerProvider, OrderIndexAccessProvider $orderIndexAccessProvider) {
         $this->segmentGetter = $getter;
+        $this->orderManagerProvider = $orderManagerProvider;
         $this->orderIndexAccessProvider = $orderIndexAccessProvider;
     }
 
@@ -22,7 +23,7 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $customers = new DataObject\Customer\Listing();
 
         foreach($customers as $customer) {
-            $customerInfo = self::getPurchaseHistory($customer->getId());
+            $customerInfo = $this->getPurchaseHistory($customer->getId());
             $this->fillOrderIndex($customerInfo);
         }
     }
@@ -31,22 +32,20 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $this->orderIndexAccessProvider->index($customerInfo->customerId, $customerInfo);
     }
 
-    private function getPurchaseHistory(int $customerId): CustomerInfo
+    public function getPurchaseHistory(int $customerId): CustomerInfo
     {
-        $orderManager = Factory::getInstance()->getOrderManager();
-
+        $orderManager = $this->orderManagerProvider->getOrderManager();
         $orderList =  $orderManager->createOrderList();
         $orderQuery = $orderList->getQuery();
 
-        $orderList->joinCustomer(\Pimcore\Model\DataObject\Customer::classId());
+        $orderList->joinCustomer($this->orderManagerProvider->getCustomerClassId());
         $orderQuery->where('customer.o_id = ?', $customerId);
-
 
         $customerInfo = new CustomerInfo($customerId);
 
-        foreach($orderList as $order)
+        foreach ($orderList as $order)
         {
-            foreach($order->getItems() as $item)
+            foreach ($order->getItems() as $item)
             {
                 $product = $item->getProduct();
 
@@ -56,16 +55,17 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
                 {
                     $segmentId = $segment->getId();
                     $found = false;
-                    foreach($customerInfo->segments as $e)
+                    foreach ($customerInfo->segments as $element)
                     {
-                        if($e->segmentId === $segmentId)
+                        if ($element->segmentId === $segmentId)
                         {
-                            $e->segmentCount++;
+                            $element->segmentCount++;
                             $found = true;
                         }
                     }
 
-                    if(!$found){
+                    if(!$found)
+                    {
                         $segmentInfo = new SegmentInfo($segmentId, 1);
                         $customerInfo->segments[] = $segmentInfo;
                     }

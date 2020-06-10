@@ -14,4 +14,12 @@ class SegmentInfo
         $this->segmentId = $segmentId;
         $this->segmentCount = $segmentCount;
     }
+
+    public static function __set_state($serializedRepresentation)
+    {
+        return new SegmentInfo(
+            $serializedRepresentation["segmentId"],
+            $serializedRepresentation["segmentCount"]
+        );
+    }
 }

@@ -5,10 +5,12 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests\Decorator;
 use CustomerManagementFrameworkBundle\Targeting\SegmentTracker;
 use PHPUnit\Framework\TestCase;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\PurchaseHistoryAdapter;
+use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductsAdapter;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\SegmentAdapter;
 use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\Decorator\EqualWeightDecorator;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
 use Pimcore\Targeting\VisitorInfoStorage;
 
 class EqualWeightDecoratorTest extends TestCase
@@ -29,7 +31,7 @@ class EqualWeightDecoratorTest extends TestCase
     public function testPurchaseHistoryAdapterOnly()
     {
         $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
-        $expectedPurchaseHistoryBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 6.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 6.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 6.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 6.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 6.0, ), ), 'boost_mode' => 'multiply', ), );
+        $expectedPurchaseHistoryBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 1.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 1.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 1.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 1.0, ), ), 'boost_mode' => 'multiply', ), );
 
         $equalWeightDecorator = new EqualWeightDecorator();
         $orderIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 1, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 1, ), 3 => array ( 'segmentId' => 971, 'segmentCount' => 1, ), 4 => array ( 'segmentId' => 970, 'segmentCount' => 1, ), );
@@ -44,7 +46,7 @@ class EqualWeightDecoratorTest extends TestCase
     public function testSegmentAdapterFirstPurchaseHistoryAdapterSecond()
     {
         $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
-        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 6.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 6.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 6.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 6.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 6.0, ), ), 'boost_mode' => 'multiply', ), );
+        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 1.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 1.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 1.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 1.0, ), ), 'boost_mode' => 'multiply', ), );
 
         $equalWeightDecorator = new EqualWeightDecorator();
 
@@ -63,7 +65,7 @@ class EqualWeightDecoratorTest extends TestCase
     public function testPurchaseHistoryAdapterFirstSegmentAdapterSecond()
     {
         $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
-        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 6.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 6.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 6.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 6.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 6.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), );
+        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 1.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 1.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 1.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 1.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), );
 
         $equalWeightDecorator = new EqualWeightDecorator();
 
@@ -71,6 +73,522 @@ class EqualWeightDecoratorTest extends TestCase
         $customerId = 1021;
         $purchaseHistoryAdapter = $this->constructPurchaseHistoryAdapter($customerId, $orderIndexResponse);
         $equalWeightDecorator->addAdapter($purchaseHistoryAdapter);
+
+        $segmentAdapter = $this->constructSegmentAdapter();
+        $equalWeightDecorator->addAdapter($segmentAdapter);
+
+        $actualBoostedQueryRed = $equalWeightDecorator->addPersonalization($queryRed);
+        self::assertEquals($expectedBoostedQueryRed, $actualBoostedQueryRed);
+    }
+
+    public function testPurchaseHistoryAdapterFirstSegmentAdapterSecondRelevantProductsAdapterThird()
+    {
+        $queryRed = array (
+            'multi_match' => array (
+                'query' => 'red',
+                'type' => 'cross_fields',
+                'operator' => 'and',
+                'fields' => array (
+                    0 => 'attributes.name^4',
+                    1 => 'attributes.name.analyzed',
+                    2 => 'attributes.name.analyzed_ngram',
+                    3 => 'attributes.manufacturer_name^3',
+                    4 => 'attributes.manufacturer_name.analyzed',
+                    5 => 'attributes.manufacturer_name.analyzed_ngram',
+                    6 => 'attributes.color',
+                    7 => 'attributes.carClass',
+                ),
+            ),
+        );
+        $expectedBoostedQueryRed = array (
+            'function_score' => array (
+                'query' => array (
+                    'function_score' => array (
+                        'query' => array (
+                            'function_score' => array(
+                                'query' => array (
+                                    'multi_match' => array (
+                                        'query' => 'red',
+                                        'type' => 'cross_fields',
+                                        'operator' => 'and',
+                                        'fields' => array (
+                                            0 => 'attributes.name^4',
+                                            1 => 'attributes.name.analyzed',
+                                            2 => 'attributes.name.analyzed_ngram',
+                                            3 => 'attributes.manufacturer_name^3',
+                                            4 => 'attributes.manufacturer_name.analyzed',
+                                            5 => 'attributes.manufacturer_name.analyzed_ngram',
+                                            6 => 'attributes.color',
+                                            7 => 'attributes.carClass',
+                                        ),
+                                    ),
+                                ),
+                                'functions' => array (
+                                    0 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 983,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    1 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 963,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    2 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 982,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    3 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 971,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    4 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 970,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                ),
+                                'boost_mode' => 'multiply',
+                            ),
+                        ),
+                        'functions' => array (
+                            0 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 860,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                            1 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 966,
+                                    ),
+                                ),
+                                'weight' => 7.0,
+                            ),
+                            2 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 967,
+                                    ),
+                                ),
+                                'weight' => 7.0,
+                            ),
+                            3 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 968,
+                                    ),
+                                ),
+                                'weight' => 7.0,
+                            ),
+                        ),
+                        'boost_mode' => 'multiply',
+                    ),
+                ),
+                'functions' => array(
+                    0 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 983,
+                            ),
+                        ),
+                        'weight' => 1.0,
+                    ),
+                    1 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 963,
+                            ),
+                        ),
+                        'weight' => 4.0,
+                    ),
+                    2 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 982,
+                            ),
+                        ),
+                        'weight' => 2.0,
+                    ),
+                ),
+                'boost_mode' => 'multiply',
+            ),
+        );
+
+        $equalWeightDecorator = new EqualWeightDecorator();
+
+        $orderIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 1, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 1, ), 3 => array ( 'segmentId' => 971, 'segmentCount' => 1, ), 4 => array ( 'segmentId' => 970, 'segmentCount' => 1, ), );
+        $relevantProductsIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 4, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 2, ), );
+        $customerId = 1021;
+        $purchaseHistoryAdapter = $this->constructPurchaseHistoryAdapter($customerId, $orderIndexResponse);
+        $equalWeightDecorator->addAdapter($purchaseHistoryAdapter);
+
+        $segmentAdapter = $this->constructSegmentAdapter();
+        $equalWeightDecorator->addAdapter($segmentAdapter);
+
+        $relevantProductsAdapter = $this->constructRelevantProductsAdapter($customerId, $relevantProductsIndexResponse);
+        $equalWeightDecorator->addAdapter($relevantProductsAdapter);
+
+        $actualBoostedQueryRed = $equalWeightDecorator->addPersonalization($queryRed);
+        self::assertEquals($expectedBoostedQueryRed, $actualBoostedQueryRed);
+    }
+
+    public function testRelevantProductsAdapterFirstPurchaseHistoryAdapterSecondSegmentAdapterThird()
+    {
+        $queryRed = array (
+            'multi_match' => array (
+                'query' => 'red',
+                'type' => 'cross_fields',
+                'operator' => 'and',
+                'fields' => array (
+                    0 => 'attributes.name^4',
+                    1 => 'attributes.name.analyzed',
+                    2 => 'attributes.name.analyzed_ngram',
+                    3 => 'attributes.manufacturer_name^3',
+                    4 => 'attributes.manufacturer_name.analyzed',
+                    5 => 'attributes.manufacturer_name.analyzed_ngram',
+                    6 => 'attributes.color',
+                    7 => 'attributes.carClass',
+                ),
+            ),
+        );
+        $expectedBoostedQueryRed = array (
+            'function_score' => array (
+                'query' => array (
+                    'function_score' => array (
+                        'query' => array (
+                            'function_score' => array(
+                                'query' => array (
+                                    'multi_match' => array (
+                                        'query' => 'red',
+                                        'type' => 'cross_fields',
+                                        'operator' => 'and',
+                                        'fields' => array (
+                                            0 => 'attributes.name^4',
+                                            1 => 'attributes.name.analyzed',
+                                            2 => 'attributes.name.analyzed_ngram',
+                                            3 => 'attributes.manufacturer_name^3',
+                                            4 => 'attributes.manufacturer_name.analyzed',
+                                            5 => 'attributes.manufacturer_name.analyzed_ngram',
+                                            6 => 'attributes.color',
+                                            7 => 'attributes.carClass',
+                                        ),
+                                    ),
+                                ),
+                                'functions' => array(
+                                    0 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 983,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    1 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 963,
+                                            ),
+                                        ),
+                                        'weight' => 4.0,
+                                    ),
+                                    2 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 982,
+                                            ),
+                                        ),
+                                        'weight' => 2.0,
+                                    ),
+                                ),
+                                'boost_mode' => 'multiply',
+                            ),
+                        ),
+                        'functions' => array (
+                            0 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 983,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                            1 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 963,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                            2 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 982,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                            3 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 971,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                            4 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 970,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                        ),
+                        'boost_mode' => 'multiply',
+                    ),
+                ),
+                'functions' => array (
+                    0 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 860,
+                            ),
+                        ),
+                        'weight' => 1.0,
+                    ),
+                    1 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 966,
+                            ),
+                        ),
+                        'weight' => 7.0,
+                    ),
+                    2 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 967,
+                            ),
+                        ),
+                        'weight' => 7.0,
+                    ),
+                    3 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 968,
+                            ),
+                        ),
+                        'weight' => 7.0,
+                    ),
+                ),
+                'boost_mode' => 'multiply',
+            ),
+        );
+
+        $equalWeightDecorator = new EqualWeightDecorator();
+
+        $orderIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 1, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 1, ), 3 => array ( 'segmentId' => 971, 'segmentCount' => 1, ), 4 => array ( 'segmentId' => 970, 'segmentCount' => 1, ), );
+        $relevantProductsIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 4, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 2, ), );
+        $customerId = 1021;
+        $relevantProductsAdapter = $this->constructRelevantProductsAdapter($customerId, $relevantProductsIndexResponse);
+        $equalWeightDecorator->addAdapter($relevantProductsAdapter);
+
+        $purchaseHistoryAdapter = $this->constructPurchaseHistoryAdapter($customerId, $orderIndexResponse);
+        $equalWeightDecorator->addAdapter($purchaseHistoryAdapter);
+
+        $segmentAdapter = $this->constructSegmentAdapter();
+        $equalWeightDecorator->addAdapter($segmentAdapter);
+
+        $actualBoostedQueryRed = $equalWeightDecorator->addPersonalization($queryRed);
+        self::assertEquals($expectedBoostedQueryRed, $actualBoostedQueryRed);
+    }
+
+    public function testPurchaseHistoryAdapterFirstRelevantProductsAdapterSecondSegmentAdapterThird()
+    {
+        $queryRed = array (
+            'multi_match' => array (
+                'query' => 'red',
+                'type' => 'cross_fields',
+                'operator' => 'and',
+                'fields' => array (
+                    0 => 'attributes.name^4',
+                    1 => 'attributes.name.analyzed',
+                    2 => 'attributes.name.analyzed_ngram',
+                    3 => 'attributes.manufacturer_name^3',
+                    4 => 'attributes.manufacturer_name.analyzed',
+                    5 => 'attributes.manufacturer_name.analyzed_ngram',
+                    6 => 'attributes.color',
+                    7 => 'attributes.carClass',
+                ),
+            ),
+        );
+        $expectedBoostedQueryRed = array (
+            'function_score' => array (
+                'query' => array (
+                    'function_score' => array (
+                        'query' => array (
+                            'function_score' => array(
+                                'query' => array (
+                                    'multi_match' => array (
+                                        'query' => 'red',
+                                        'type' => 'cross_fields',
+                                        'operator' => 'and',
+                                        'fields' => array (
+                                            0 => 'attributes.name^4',
+                                            1 => 'attributes.name.analyzed',
+                                            2 => 'attributes.name.analyzed_ngram',
+                                            3 => 'attributes.manufacturer_name^3',
+                                            4 => 'attributes.manufacturer_name.analyzed',
+                                            5 => 'attributes.manufacturer_name.analyzed_ngram',
+                                            6 => 'attributes.color',
+                                            7 => 'attributes.carClass',
+                                        ),
+                                    ),
+                                ),
+                                'functions' => array (
+                                    0 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 983,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    1 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 963,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    2 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 982,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    3 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 971,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                    4 => array (
+                                        'filter' => array (
+                                            'match' => array (
+                                                'relations.segments' => 970,
+                                            ),
+                                        ),
+                                        'weight' => 1.0,
+                                    ),
+                                ),
+                                'boost_mode' => 'multiply',
+                            ),
+                        ),
+                        'functions' => array(
+                            0 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 983,
+                                    ),
+                                ),
+                                'weight' => 1.0,
+                            ),
+                            1 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 963,
+                                    ),
+                                ),
+                                'weight' => 4.0,
+                            ),
+                            2 => array (
+                                'filter' => array (
+                                    'match' => array (
+                                        'relations.segments' => 982,
+                                    ),
+                                ),
+                                'weight' => 2.0,
+                            ),
+                        ),
+                        'boost_mode' => 'multiply',
+                    ),
+                ),
+                'functions' => array (
+                    0 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 860,
+                            ),
+                        ),
+                        'weight' => 1.0,
+                    ),
+                    1 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 966,
+                            ),
+                        ),
+                        'weight' => 7.0,
+                    ),
+                    2 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 967,
+                            ),
+                        ),
+                        'weight' => 7.0,
+                    ),
+                    3 => array (
+                        'filter' => array (
+                            'match' => array (
+                                'relations.segments' => 968,
+                            ),
+                        ),
+                        'weight' => 7.0,
+                    ),
+                ),
+                'boost_mode' => 'multiply',
+            ),
+        );
+
+        $equalWeightDecorator = new EqualWeightDecorator();
+
+        $orderIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 1, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 1, ), 3 => array ( 'segmentId' => 971, 'segmentCount' => 1, ), 4 => array ( 'segmentId' => 970, 'segmentCount' => 1, ), );
+        $relevantProductsIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 4, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 2, ), );
+        $customerId = 1021;
+        $purchaseHistoryAdapter = $this->constructPurchaseHistoryAdapter($customerId, $orderIndexResponse);
+        $equalWeightDecorator->addAdapter($purchaseHistoryAdapter);
+
+        $relevantProductsAdapter = $this->constructRelevantProductsAdapter($customerId, $relevantProductsIndexResponse);
+        $equalWeightDecorator->addAdapter($relevantProductsAdapter);
 
         $segmentAdapter = $this->constructSegmentAdapter();
         $equalWeightDecorator->addAdapter($segmentAdapter);
@@ -113,5 +631,22 @@ class EqualWeightDecoratorTest extends TestCase
             ->willReturn($customerId);
 
         return new PurchaseHistoryAdapter($orderIndex, $customerIdProvider);
+    }
+
+    private function constructRelevantProductsAdapter(int $customerId, array $relevantProductsIndexResponse) : RelevantProductsAdapter
+    {
+        $relevantProductsIndex = $this->getMockBuilder(RelevantProductIndexAccessProvider::class)
+            ->setMethods(['fetchSegments'])
+            ->getMock();
+        $relevantProductsIndex->method('fetchSegments')
+            ->willReturn($relevantProductsIndexResponse);
+
+        $customerIdProvider = $this->getMockBuilder(PersonalizationAdapterCustomerIdProvider::class)
+            ->setMethods(['getCustomerId'])
+            ->getMock();
+        $customerIdProvider->method('getCustomerId')
+            ->willReturn($customerId);
+
+        return new RelevantProductsAdapter($relevantProductsIndex, $customerIdProvider);
     }
 }
