@@ -103,26 +103,30 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
 
     public function dropCustomerGroupAssignmentIndex()
     {
-        if($this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex]))
+        if($this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex])) {
             $this->esClient->indices()->delete(['index' => self::$customerGroupAssignmentIndex]);
+        }
     }
 
     public function dropCustomerGroupIndex()
     {
-        if($this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
+        if($this->esClient->indices()->exists(['index' => self::$customerGroupIndex])) {
             $this->esClient->indices()->delete(['index' => self::$customerGroupIndex]);
+        }
     }
 
     public function createCustomerGroupAssignmentIndex()
     {
-        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex]))
+        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex])) {
             $this->esClient->indices()->create(['index' => self::$customerGroupAssignmentIndex]);
+        }
     }
 
     public function createCustomerGroupIndex()
     {
-        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
+        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupIndex])) {
             $this->esClient->indices()->create(['index' => self::$customerGroupIndex]);
+        }
     }
 
     public function fetchSegments(int $customerId): array

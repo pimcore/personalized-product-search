@@ -12,7 +12,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
 {
     private $segmentGetter;
     private $customerGroupIndexAccessProvider;
-    private const PROCENTUAL_INTERSECTION = 0.4;
+    private const PROCENTUAL_INTERSECTION = 0.6;
 
     public function __construct(GetterInterface $getter, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
         $this->segmentGetter = $getter;
@@ -52,9 +52,15 @@ class CustomerGroupProvider implements CustomerGroupInterface
 
             $intersection = array_intersect($customerInfoSegmentIds, $customerGroupSegmentIds);
 
-            if (sizeof($customerInfoSegmentIds) > 0 && sizeof($customerGroupSegmentIds) > 0 &&
-                sizeof($intersection) / sizeof($customerInfoSegmentIds) > self::PROCENTUAL_INTERSECTION
-                && sizeof($intersection) / sizeof($customerGroupSegmentIds) > self::PROCENTUAL_INTERSECTION)
+            if (sizeof($customerInfoSegmentIds) == 0 || sizeof($customerGroupSegmentIds) == 0) {
+                continue;
+            }
+
+            $customerInfoMatchPercentage = sizeof($intersection) / sizeof($customerInfoSegmentIds);
+            $customerGroupMatchPercentage = sizeof($intersection) / sizeof($customerGroupSegmentIds);
+
+            if ($customerInfoMatchPercentage > self::PROCENTUAL_INTERSECTION
+                && $customerGroupMatchPercentage > self::PROCENTUAL_INTERSECTION)
             {
                 // assign to existing group
                 $customerGroupAssignment = new CustomerGroupAssignment($customerId, $customerGroup);
