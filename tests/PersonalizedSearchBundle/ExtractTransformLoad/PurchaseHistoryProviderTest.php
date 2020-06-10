@@ -5,9 +5,7 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests\ExtractTransformLoad;
 
 use PHPUnit\Framework\TestCase;
 use Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\OrderManagerInterface;
-use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentInfo;
-use Pimcore\Model\DataObject\CustomerSegment;
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerInfo;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider;
