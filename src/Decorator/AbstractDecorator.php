@@ -30,8 +30,10 @@ abstract class AbstractDecorator implements AdapterInterface
 
     public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
     {
+        $res = [];
+
         foreach ($this->adapters as $adapter) {
-            $res = $adapter->addDebugInfo($weight, $boostMode);
+            $res[] = $adapter->getDebugInfo($weight, $boostMode);
         }
         return $res;
     }
