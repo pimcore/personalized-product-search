@@ -31,7 +31,7 @@ class EqualWeightDecoratorTest extends TestCase
     public function testPurchaseHistoryAdapterOnly()
     {
         $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
-        $expectedPurchaseHistoryBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 1.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 1.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 1.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 1.0, ), ), 'boost_mode' => 'multiply', ), );
+        $expectedPurchaseHistoryBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 8.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 8.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 8.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 8.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 8.0, ), ), 'boost_mode' => 'multiply', ), );
 
         $equalWeightDecorator = new EqualWeightDecorator();
         $orderIndexResponse = array ( 0 => array ( 'segmentId' => 983, 'segmentCount' => 1, ), 1 => array ( 'segmentId' => 963, 'segmentCount' => 1, ), 2 => array ( 'segmentId' => 982, 'segmentCount' => 1, ), 3 => array ( 'segmentId' => 971, 'segmentCount' => 1, ), 4 => array ( 'segmentId' => 970, 'segmentCount' => 1, ), );
@@ -46,7 +46,7 @@ class EqualWeightDecoratorTest extends TestCase
     public function testSegmentAdapterFirstPurchaseHistoryAdapterSecond()
     {
         $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
-        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 1.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 1.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 1.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 1.0, ), ), 'boost_mode' => 'multiply', ), );
+        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 8.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 8.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 8.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 8.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 8.0, ), ), 'boost_mode' => 'multiply', ), );
 
         $equalWeightDecorator = new EqualWeightDecorator();
 
@@ -65,7 +65,7 @@ class EqualWeightDecoratorTest extends TestCase
     public function testPurchaseHistoryAdapterFirstSegmentAdapterSecond()
     {
         $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
-        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 1.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 1.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 1.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 1.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), );
+        $expectedBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 983, ), ), 'weight' => 8.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 963, ), ), 'weight' => 8.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 982, ), ), 'weight' => 8.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 971, ), ), 'weight' => 8.0, ), 4 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 970, ), ), 'weight' => 8.0, ), ), 'boost_mode' => 'multiply', ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 7.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 7.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 7.0, ), ), 'boost_mode' => 'multiply', ), );
 
         $equalWeightDecorator = new EqualWeightDecorator();
 
@@ -130,7 +130,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 983,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     1 => array (
                                         'filter' => array (
@@ -138,7 +138,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 963,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     2 => array (
                                         'filter' => array (
@@ -146,7 +146,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 982,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     3 => array (
                                         'filter' => array (
@@ -154,7 +154,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 971,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     4 => array (
                                         'filter' => array (
@@ -162,7 +162,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 970,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                 ),
                                 'boost_mode' => 'multiply',
@@ -212,7 +212,7 @@ class EqualWeightDecoratorTest extends TestCase
                                 'relations.segments' => 983,
                             ),
                         ),
-                        'weight' => 1.0,
+                        'weight' => 8.0,
                     ),
                     1 => array (
                         'filter' => array (
@@ -220,7 +220,7 @@ class EqualWeightDecoratorTest extends TestCase
                                 'relations.segments' => 963,
                             ),
                         ),
-                        'weight' => 4.0,
+                        'weight' => 32.0,
                     ),
                     2 => array (
                         'filter' => array (
@@ -228,7 +228,7 @@ class EqualWeightDecoratorTest extends TestCase
                                 'relations.segments' => 982,
                             ),
                         ),
-                        'weight' => 2.0,
+                        'weight' => 16.0,
                     ),
                 ),
                 'boost_mode' => 'multiply',
@@ -302,7 +302,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 983,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     1 => array (
                                         'filter' => array (
@@ -310,7 +310,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 963,
                                             ),
                                         ),
-                                        'weight' => 4.0,
+                                        'weight' => 32.0,
                                     ),
                                     2 => array (
                                         'filter' => array (
@@ -318,7 +318,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 982,
                                             ),
                                         ),
-                                        'weight' => 2.0,
+                                        'weight' => 16.0,
                                     ),
                                 ),
                                 'boost_mode' => 'multiply',
@@ -331,7 +331,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 983,
                                     ),
                                 ),
-                                'weight' => 1.0,
+                                'weight' => 8.0,
                             ),
                             1 => array (
                                 'filter' => array (
@@ -339,7 +339,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 963,
                                     ),
                                 ),
-                                'weight' => 1.0,
+                                'weight' => 8.0,
                             ),
                             2 => array (
                                 'filter' => array (
@@ -347,7 +347,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 982,
                                     ),
                                 ),
-                                'weight' => 1.0,
+                                'weight' => 8.0,
                             ),
                             3 => array (
                                 'filter' => array (
@@ -355,7 +355,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 971,
                                     ),
                                 ),
-                                'weight' => 1.0,
+                                'weight' => 8.0,
                             ),
                             4 => array (
                                 'filter' => array (
@@ -363,7 +363,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 970,
                                     ),
                                 ),
-                                'weight' => 1.0,
+                                'weight' => 8.0,
                             ),
                         ),
                         'boost_mode' => 'multiply',
@@ -474,7 +474,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 983,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     1 => array (
                                         'filter' => array (
@@ -482,7 +482,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 963,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     2 => array (
                                         'filter' => array (
@@ -490,7 +490,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 982,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     3 => array (
                                         'filter' => array (
@@ -498,7 +498,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 971,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                     4 => array (
                                         'filter' => array (
@@ -506,7 +506,7 @@ class EqualWeightDecoratorTest extends TestCase
                                                 'relations.segments' => 970,
                                             ),
                                         ),
-                                        'weight' => 1.0,
+                                        'weight' => 8.0,
                                     ),
                                 ),
                                 'boost_mode' => 'multiply',
@@ -519,7 +519,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 983,
                                     ),
                                 ),
-                                'weight' => 1.0,
+                                'weight' => 8.0,
                             ),
                             1 => array (
                                 'filter' => array (
@@ -527,7 +527,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 963,
                                     ),
                                 ),
-                                'weight' => 4.0,
+                                'weight' => 32.0,
                             ),
                             2 => array (
                                 'filter' => array (
@@ -535,7 +535,7 @@ class EqualWeightDecoratorTest extends TestCase
                                         'relations.segments' => 982,
                                     ),
                                 ),
-                                'weight' => 2.0,
+                                'weight' => 16.0,
                             ),
                         ),
                         'boost_mode' => 'multiply',
