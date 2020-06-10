@@ -15,7 +15,6 @@ services:
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductsAdapter: ~
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider: ~
-    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider'
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider: ~
