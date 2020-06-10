@@ -9,8 +9,8 @@ use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductsAdapter;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\SegmentAdapter;
 use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\Decorator\EqualWeightDecorator;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
 use Pimcore\Targeting\VisitorInfoStorage;
 
 class EqualWeightDecoratorTest extends TestCase
@@ -635,7 +635,7 @@ class EqualWeightDecoratorTest extends TestCase
 
     private function constructRelevantProductsAdapter(int $customerId, array $relevantProductsIndexResponse) : RelevantProductsAdapter
     {
-        $relevantProductsIndex = $this->getMockBuilder(RelevantProductIndexAccessProvider::class)
+        $relevantProductsIndex = $this->getMockBuilder(CustomerGroupIndexAccessProvider::class)
             ->setMethods(['fetchSegments'])
             ->getMock();
         $relevantProductsIndex->method('fetchSegments')

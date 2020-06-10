@@ -3,6 +3,7 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
 

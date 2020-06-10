@@ -6,7 +6,7 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests\Adapter;
 use PHPUnit\Framework\TestCase;
 use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductsAdapter;
 use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider;
 
 class RelevantProductsAdapterTest extends TestCase
 {
@@ -51,7 +51,7 @@ class RelevantProductsAdapterTest extends TestCase
 
     private function constructRelevantProductsAdapter(int $customerId, array $relevantProductsIndexResponse) : RelevantProductsAdapter
     {
-        $relevantProductsIndex = $this->getMockBuilder(RelevantProductIndexAccessProvider::class)
+        $relevantProductsIndex = $this->getMockBuilder(CustomerGroupIndexAccessProvider::class)
             ->setMethods(['fetchSegments'])
             ->getMock();
         $relevantProductsIndex->method('fetchSegments')

@@ -4,14 +4,14 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
 use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider as CustomerIdProvider;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 
 class RelevantProductsAdapter extends AbstractAdapter
 {
     private static $ADDITIONAL_WEIGHT = 8;
 
     /**
-     * @var RelevantProductIndexAccessProvider
+     * @var CustomerGroupIndexAccessProviderInterface
      */
     private $relevantProductIndex;
 
@@ -20,7 +20,7 @@ class RelevantProductsAdapter extends AbstractAdapter
      */
     private $customerIdProvider;
 
-    public function __construct(RelevantProductIndexAccessProvider $relevantProductIndex, CustomerIdProvider $customerIdProvider)
+    public function __construct(CustomerGroupIndexAccessProviderInterface $relevantProductIndex, CustomerIdProvider $customerIdProvider)
     {
         $this->relevantProductIndex = $relevantProductIndex;
         $this->customerIdProvider = $customerIdProvider;
