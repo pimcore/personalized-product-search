@@ -52,21 +52,20 @@ class CustomerGroupProvider implements CustomerGroupInterface
 
             $intersection = array_intersect($customerInfoSegmentIds, $customerGroupSegmentIds);
 
-            if (sizeof($customerInfoSegmentIds) == 0 || sizeof($customerGroupSegmentIds) == 0) {
-                continue;
-            }
+            if (sizeof($customerInfoSegmentIds) > 0 && sizeof($customerGroupSegmentIds) > 0) {
 
-            $customerInfoMatchPercentage = sizeof($intersection) / sizeof($customerInfoSegmentIds);
-            $customerGroupMatchPercentage = sizeof($intersection) / sizeof($customerGroupSegmentIds);
+                $customerInfoMatchPercentage = sizeof($intersection) / sizeof($customerInfoSegmentIds);
+                $customerGroupMatchPercentage = sizeof($intersection) / sizeof($customerGroupSegmentIds);
 
-            if ($customerInfoMatchPercentage > self::PROCENTUAL_INTERSECTION
-                && $customerGroupMatchPercentage > self::PROCENTUAL_INTERSECTION)
-            {
-                // assign to existing group
-                $customerGroupAssignment = new CustomerGroupAssignment($customerId, $customerGroup);
-                $this->customerGroupIndexAccessProvider->indexCustomerGroupAssignment($customerGroupAssignment);
+                if ($customerInfoMatchPercentage > self::PROCENTUAL_INTERSECTION
+                    && $customerGroupMatchPercentage > self::PROCENTUAL_INTERSECTION)
+                {
+                    // assign to existing group
+                    $customerGroupAssignment = new CustomerGroupAssignment($customerId, $customerGroup);
+                    $this->customerGroupIndexAccessProvider->indexCustomerGroupAssignment($customerGroupAssignment);
 
-                $isAssigned = true;
+                    $isAssigned = true;
+                }
             }
         }
 
