@@ -19,6 +19,9 @@ class CustomerGroupProvider implements CustomerGroupInterface
         $this->customerGroupIndexAccessProvider = $customerGroupIndexAccessProvider;
     }
 
+    /**
+     * Creates and updates the customer group and customer group assignment indices
+     */
     public function updateCustomerGroupAndSegmentsIndicesFromOrderDb()
     {
         $customers = new DataObject\Customer\Listing();
@@ -34,6 +37,11 @@ class CustomerGroupProvider implements CustomerGroupInterface
         }
     }
 
+    /**
+     * Assigns a customer to a group of similar customers
+     * If no group is found, a new one is created
+     * @param int $customerId
+     */
     private function assignCustomerToCustomerGroup(int $customerId)
     {
         $customerInfo = self::getPurchaseHistory($customerId);
@@ -83,6 +91,11 @@ class CustomerGroupProvider implements CustomerGroupInterface
         }
     }
 
+    /**
+     * Gets the purchase history of a customer
+     * @param int $customerId
+     * @return CustomerInfo
+     */
     private function getPurchaseHistory(int $customerId): CustomerInfo
     {
         $orderManager = Factory::getInstance()->getOrderManager();
