@@ -14,4 +14,5 @@ interface CustomerGroupIndexAccessProviderInterface
     public function dropCustomerGroupIndex();
     public function createCustomerGroupAssignmentIndex();
     public function createCustomerGroupIndex();
+    public function fetchSegments(int $customerId): array;
 }

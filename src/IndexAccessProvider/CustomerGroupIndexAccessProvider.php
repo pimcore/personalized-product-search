@@ -124,4 +124,47 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         if(!$this->esClient->indices()->exists(['index' => self::$customerGroupIndex]))
             $this->esClient->indices()->create(['index' => self::$customerGroupIndex]);
     }
+
+    public function fetchSegments(int $customerId): array
+    {
+        $params = [
+            'index' => self::$customerGroupAssignmentIndex,
+            'type' => '_doc',
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'customerId' => $customerId
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->esClient->search($params)['hits']['hits'];
+
+        if(sizeof($response) === 0) {
+            return [];
+        }
+
+        $customerGroupId = $response[0]['_source']['customerGroupId'];
+
+        $params = [
+            'index' => self::$customerGroupIndex,
+            'type' => '_doc',
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'customerGroupId' => $customerGroupId
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->esClient->search($params)['hits']['hits'];
+
+        if(sizeof($response) === 0) {
+            return [];
+        }
+
+        return $response[0]['_source']['segments'];
+    }
 }
