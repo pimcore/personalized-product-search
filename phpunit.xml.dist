@@ -15,6 +15,10 @@
                 <file>src/PersonalizedSearchBundle.php</file>
                 <directory suffix=".php">src/tests</directory>
                 <directory suffix=".php">src/ExtractTransformLoad/Command</directory>
+                <directory suffix=".php">src/IndexAccessProvider</directory>
+                <file>src/ExtractTransformLoad/CustomerGroupProvider.php</file>
+                <file>src/ExtractTransformLoad/CustomerGroup.php</file>
+                <file>src/ExtractTransformLoad/CustomerGroupAssignment.php</file>
             </exclude>
         </whitelist>
     </filter>
