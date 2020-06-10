@@ -8,6 +8,7 @@ use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductI
 
 class RelevantProductsAdapter extends AbstractAdapter
 {
+    private static $ADDITIONAL_WEIGHT = 8;
 
     /**
      * @var RelevantProductIndexAccessProvider
@@ -45,7 +46,7 @@ class RelevantProductsAdapter extends AbstractAdapter
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight
+                'weight' => $segmentCount * $weight * RelevantProductsAdapter::$ADDITIONAL_WEIGHT
             ];
         }
 

@@ -18,7 +18,6 @@ services:
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider'
 
-    Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface: '@AppBundle\Ecommerce\IndexService\SegmentGetter'
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider'
 

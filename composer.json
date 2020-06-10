@@ -3,7 +3,8 @@
   "type": "pimcore-bundle",
   "autoload": {
     "psr-4": {
-      "Pimcore\\Bundle\\PersonalizedSearchBundle\\": "src"
+      "Pimcore\\Bundle\\PersonalizedSearchBundle\\": "src",
+      "Pimcore\\Bundle\\PersonalizedSearchBundle\\Tests\\": "tests/PersonalizedSearchBundle"
     },
     "exclude-from-classmap": [
       "vendor/phpunit"
