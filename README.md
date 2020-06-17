@@ -81,7 +81,6 @@ Adapters modify existing queries. The following example should give an overview 
 ```php
 $queryKey = 'searchTerm';
 
-//$personalizationDecorator = new PerformanceMeasurementDecorator(new AdapterPerformanceIndexAccessProvider());
 $personalizationDecorator = new EqualWeightDecorator();
 $personalizationDecorator
     ->addAdapter($relevantProductAdapter)
