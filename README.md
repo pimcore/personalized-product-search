@@ -134,5 +134,13 @@ Finally, the adapter should be added to *services.yml* to make it available via 
 AppBundle\Personalization\Adapter\YourAdapter: ~
 ```
 
+## Detailed documentation
+- [Accessing an ES index](./doc/AccessESIndex.md)
+- [Adapters](./doc/Adapters.md)
+- [Architecture](./doc/)
+- [Decorators](./doc/Decorators.md)
+- [ETL](./doc/ETL.md)
+- [Unit testing](./doc/UnitTesting.md)
+
 ## Load test and architecture
 A detailed documentation for the architecture is available under the [following link](./doc/Architecture.md). As well you can find detailes for the load tests under [this link](./doc/LoadTesting.md).
