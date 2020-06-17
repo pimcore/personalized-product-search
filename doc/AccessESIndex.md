@@ -1,3 +1,5 @@
+# Implementation to access an Elasticsearch index
+
 To access the an ES index the official PHP low-level [client](https://github.com/elastic/elasticsearch-php/blob/master/src/Elasticsearch/Client.php) for Elasticsearch is used. The _Client_ is retrieved from the _ClientBuilder_: 
 
 ```php
