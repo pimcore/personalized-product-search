@@ -20,11 +20,12 @@ In detail, the segments of a customer's purchased products will be saved into th
 ## ETL mechanism for the relevant products adapter
 
 As for purchase history ETL there also exists an interface for the relevant products ETL:
-
+```
 interface CustomerGroupInterface
 {
     public function updateCustomerGroupAndSegmentsIndicesFromOrderDb();
 }
+```
 
 Yet, there is only the possibility to update the assignments for all customers at once. The goal of the relevant products ETL is to assign customers with similar purchase behavior to the same group. There exist two ES indices, one for the group assignment for each customer and one for the groups itself, which contains the similar segments of all customers in this group.
 
