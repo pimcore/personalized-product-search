@@ -8,6 +8,8 @@ use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccess
 
 class PurchaseHistoryAdapter extends AbstractAdapter
 {
+    private static $ADDITIONAL_WEIGHT = 8;
+
     /**
      * @var OrderIndexAccessProvider
      */
@@ -45,7 +47,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight
+                'weight' => $segmentCount * $weight * PurchaseHistoryAdapter::$ADDITIONAL_WEIGHT
             ];
         }
 
