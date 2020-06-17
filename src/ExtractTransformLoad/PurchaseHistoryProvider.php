@@ -19,6 +19,9 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         $this->orderIndexAccessProvider = $orderIndexAccessProvider;
     }
 
+    /**
+     * Creates and updates the order history index
+     */
     public function updateOrderIndexFromOrderDb() {
         $customers = new DataObject\Customer\Listing();
 
@@ -28,10 +31,20 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
         }
     }
 
+    /**
+     * Adds a CustomerInfo object to the order history index
+     * @param CustomerInfo $customerInfo
+     * @return mixed
+     */
     public function fillOrderIndex(CustomerInfo $customerInfo) {
         $this->orderIndexAccessProvider->index($customerInfo->customerId, $customerInfo);
     }
 
+    /**
+     * Returns the CustomerInfo with the purchase history for a customer
+     * @param int $customerId
+     * @return CustomerInfo
+     */
     public function getPurchaseHistory(int $customerId): CustomerInfo
     {
         $orderManager = $this->orderManagerProvider->getOrderManager();
