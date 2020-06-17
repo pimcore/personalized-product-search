@@ -84,9 +84,9 @@ $queryKey = 'searchTerm';
 //$personalizationDecorator = new PerformanceMeasurementDecorator(new AdapterPerformanceIndexAccessProvider());
 $personalizationDecorator = new EqualWeightDecorator();
 $personalizationDecorator
-    ->addAdapter($relevantProductAdapter);
-    //->addAdapter($purchaseHistoryAdapter);
-    //->addAdapter($segmentAdapter);
+    ->addAdapter($relevantProductAdapter)
+    ->addAdapter($purchaseHistoryAdapter)
+    ->addAdapter($segmentAdapter);
 $query = $personalizationDecorator->addPersonalization($query);
 $productListing->addQueryCondition($query, $queryKey);
 
