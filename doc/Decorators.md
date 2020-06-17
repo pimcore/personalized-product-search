@@ -72,3 +72,81 @@ class EqualWeightDecorator extends AbstractDecorator
     }
 }
 ```
+
+## PerformanceMeasurementDecorator
+The *PerformanceMeasurementDecorator* simply measures time it takes for an adapter to execute the *addPersonalization* method. The resulting information is then stored in an Elasticsearch index. However, this index is not created automatically and must be created manually as shown below.
+
+### Adapter implementation
+Since we extend from AbstractDecorator which defines the abstract method invokeAdapter we can intercept the adapter calls:
+```php
+protected function invokeAdapter(AdapterInterface $adapter, array $query): array
+    {
+        $start = microtime(true);
+        $res = $adapter->addPersonalization($query);
+        $elapsedTimeInSeconds = microtime(true) - $start;
+
+        $performanceInfo = new PerformanceInfo(get_class($adapter), $elapsedTimeInSeconds * 1000);
+        $this->adapterPerformanceIndex->index(0, $performanceInfo);
+
+        return $res;
+    }
+```
+
+### Create the index
+```
+PUT adapter_performance 
+{
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "adapterName" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "elapsedTime" : {
+          "type" : "float"
+        },
+        "timestamp" : {
+          "type" : "date",
+          "format": "yyyy-MM-dd HH:mm:ss"
+        }
+      }
+    }
+  }
+}
+```
+
+### Data structure
+An entry looks as follows in Elasticsearch:
+```
+{
+  "_index": "adapter_performance",
+  "_type": "_doc",
+  "_id": "0ILCeXIB5LbQlYFX_xlX",
+  "_version": 1,
+  "_score": 1,
+  "_source": {
+    "adapterName": "Pimcore\\Bundle\\PersonalizedSearchBundle\\Adapter\\RelevantProductsAdapter",
+    "elapsedTime": 3.924131393432617,
+    "timestamp": "2020-06-03 12:38:42"
+  },
+  "fields": {
+    "timestamp": [
+      "2020-06-03T12:38:42.000Z"
+    ]
+  }
+}
+```
+
+The gathered data can be used for analysations directly in Kibana. An example of a visualization of the overall adapter performances (min, max, average) is shown below:
+[ExampleAdapterComparison](./img/example_adapter_comparison.png)
+
+### Usage
+```
+$personalizationDecorator = new PerformanceMeasurementDecorator(new AdapterPerformanceIndexAccessProvider());
+```
