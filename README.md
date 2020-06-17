@@ -73,6 +73,12 @@ class FactoryPersonalizationAdapterCustomerIdProvider implements Personalization
 }
 ```
 
-### Using the ETL mechanism programatically, via commands and via cron jobs
-[ETL mechanism usage](./doc/ETL.md)
+### Using the ETL mechanism
+To invoke the ETL mechanism, there are three ways:
+
+* Programatically through interfaces which can be injected
+* Via executing a command on the command line
+* Via creating cron job entries to automate the invocation
+
+For more details see [ETL](./doc/ETL.md).
 

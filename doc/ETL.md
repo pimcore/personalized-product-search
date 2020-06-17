@@ -40,14 +40,14 @@ Our implemented strategy to creating the customer groups and assigning the custo
 In this section will be described, how to use the ETL mechanism in its different ways.
 
 ### Programatically
-To invoke the ETL programatically, the interfaces `PurchaseHistoryInterface` and `CustomerGroupInterface` can be used to fill the ES indices.
+To invoke the ETL programatically, the interfaces `PurchaseHistoryInterface` and `CustomerGroupInterface` can be used to fill the ES indices. Both interfaces can be injected through the Dependency Injection Container, the concrete implementation which is used is stated in the services.yml, but at this point there exists only one implementation for each interface.
 
 ### Command
 To run the **ETL mechanism** from the console, navigate to the folder containing the console
 
  `/home/pimcoredemo/www` 
  
- and enter 
+ and enter the following command:
  
  `./bin/console personalizedsearch:start-etl`.
 
