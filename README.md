@@ -74,11 +74,28 @@ class FactoryPersonalizationAdapterCustomerIdProvider implements Personalization
 ```
 
 ### Using the ETL mechanism
-To invoke the ETL mechanism, there are three ways:
+The ETL mechanism can be invoked in 3 ways.
 
-* Programatically through interfaces which can be injected
-* Via executing a command on the command line
-* Via creating cron job entries to automate the invocation
+#### Programatically through interfaces which can be injected
+Extract purchase history for all customers:
 
-For more details see [ETL](./doc/ETL.md).
+`purchaseHistoryProvider->updateOrderIndexFromOrderDb()`
+
+Or just for a single customer:
+
+`purchaseHistoryProvider->fillOrderIndex(customer)`
+
+Updating the customer-group assignments:
+
+`customerGroupProvider->updateCustomerGroupAndSegmentsIndicesFromOrderDb()`
+#### Via executing a command on the command line
+`./bin/console personalizedsearch:start-etl ExampleArgument`
+
+The argument *ExampleArgument* is optional. When no argument is given, the ETL is executed for purchase history and relevant products, otherwise only for the given one. The value for the argument can be *PurchaseHistory* or *CustomerGroup*.
+#### Via creating cron job entries to automate the invocation
+For running the whole ETL every hour, following entry has to be made in the cron tab:
+
+`* */1 * * * /home/pimcoredemo/www/bin/console personalizedsearch:start-etl >> /tmp/personalizedsearch-etl.log`
+
+For more details about the ETL and its usage see [ETL](./doc/ETL.md).
 
