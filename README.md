@@ -7,3 +7,8 @@ Furthermore, the bundle is designed to be integrated into existing solutions as 
 ## Provided Functionality in a Nutshell
 
 
+## Usage
+
+### Using the ETL mechanism programatically, via commands and via cron jobs
+[ETL mechanism usage](./doc/ETL.md)
+
