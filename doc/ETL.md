@@ -6,7 +6,7 @@ The ETL mechanism is responsible for providing the necessary data in the ES indi
 
 By using the following interface, either the purchase information of all customers or only specific ones can be extracted from the Order Database in order to fill the ES index.
 
-```
+```php
 interface PurchaseHistoryInterface
 {
     public function fillOrderIndex(CustomerInfo $customerInfo);
@@ -20,7 +20,7 @@ In detail, the segments of a customer's purchased products will be saved into th
 ## ETL mechanism for the relevant products adapter
 
 As for purchase history ETL there also exists an interface for the relevant products ETL:
-```
+```php
 interface CustomerGroupInterface
 {
     public function updateCustomerGroupAndSegmentsIndicesFromOrderDb();
