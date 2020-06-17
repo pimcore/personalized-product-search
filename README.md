@@ -133,3 +133,11 @@ Finally, the adapter should be added to *services.yml* to make it available via 
 ```yml
 AppBundle\Personalization\Adapter\YourAdapter: ~
 ```
+
+## Detailed documentation
+- [Accessing an ES index](./doc/AccessESIndex.md)
+- [Adapters](./doc/Adapters.md)
+- [Architecture](./doc/)
+- [Decorators](./doc/Decorators.md)
+- [ETL](./doc/ETL.md)
+- [Unit testing](./doc/UnitTesting.md)
