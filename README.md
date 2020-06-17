@@ -73,6 +73,31 @@ class FactoryPersonalizationAdapterCustomerIdProvider implements Personalization
 }
 ```
 
+### Injecting adapters/decorators
+Default adapters (*SegmentAdapter*, *PurchaseHistoryAdapter* and *RelevantProductsAdapter*) and default decorators (*EqualWeightDecorator*, *PerformanceMeasurementDecorator*) that are shipped with the Personalization-Bundle are already available via dependency injection. Just make sure all necessary interfaces are implemented and available as explained above.
+
+### Personalizing queries
+Adapters modify existing queries. The following example should give an overview of how decorators and adapters can be used:
+```php
+$queryKey = 'searchTerm';
+
+//$personalizationDecorator = new PerformanceMeasurementDecorator(new AdapterPerformanceIndexAccessProvider());
+$personalizationDecorator = new EqualWeightDecorator();
+$personalizationDecorator
+    ->addAdapter($relevantProductAdapter);
+    //->addAdapter($purchaseHistoryAdapter);
+    //->addAdapter($segmentAdapter);
+$query = $personalizationDecorator->addPersonalization($query);
+$productListing->addQueryCondition($query, $queryKey);
+
+echo '<pre>';
+print_r($personalizationDecorator->getDebugInfo());
+echo '</pre>';
+```
+First, the used decorators and adapters need to be injected, which is not shown in the code snippet. Then a decorator is defined to manage the underlying adapters. Those can easily be added to the decorator using the *addAdapter* method. After adding adapters *addPersonalization* can be called for the decorator. It takes the Elasticsearch-query as a parameter. This method returns the modified, personalized, query which can then be executed.
+
+For debug purposes, it might be interesting what the modifications (segments and boosting value for each adapter) looks like. For this case the method *getDebugInfo* exists.
+
 ### Using the ETL mechanism
 The ETL mechanism can be invoked in 3 ways.
 
