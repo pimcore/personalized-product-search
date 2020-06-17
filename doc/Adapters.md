@@ -7,7 +7,7 @@ Three different implementations are provided:
 * *PurchaseHistoryAdapter*: Adds personalization to order products by the customers buying behaviour. Therefore we need segments based on all orders a customer made. Currently this adapter simply weights products containing segments based on the extracted segments from the orders.
 * *RelevantProductsAdapter*: Adds personalization based on a certain customer group the customer is assigned. Each customer group contains segments. Searched products are ordered based on the segments in the corresponding customer group.
 
-Every adapter takes an array which represents the Elasticsearch query. This query is wrapped 
+Every adapter takes an array which represents the Elasticsearch query. The query is wrapped into a `function_score` of Elasticsearch.
 
 This is what the query looks like if two adapters are executed:
 
@@ -197,14 +197,46 @@ to query all assigned segments of the current visitor. This segments represent t
 Having this information we can boost our query and therfore order products which the user is more interested in at the beginning.
 
 ## PurchaseHistoryAdapter
+The purchase history adapter uses:
 
 ```php
-
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 ```
 
+An implementation of the `PersonalizationAdapterCustomerIdProvider` defines how to fetch the customer id of the logged in user. After that all segments of the user are fetched from the order index in Elasticsearch using the `OrderIndexAccessProvider`.
+
+One Elasticsearch index (`order_segments`) is necessary to fetch the users segments.
+
 ## RelevantProductsAdapter
+The relevant products adapter uses:
 
 ```php
+use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider as CustomerIdProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
+```
 
+An implementation of the `PersonalizationAdapterCustomerIdProvider` defines how to fetch the customer id of the logged in user. After that all segments of the user are fetched from the corresponding indices in Elasticsearch using the `CustomerGroupIndexAccessProviderInterface`.
 
+Two elastic search indices are necessary. One for assigning a Customer to a Customer Group (`customergroup`) and one for assigning all Customer Groups to Segments (`customergroup_segments`).
+
+### Customer assigned to CustomerGroup -> CustomerGroupIndex
+```json
+{
+   "customerId":1,
+   "customerGroupId": 1
+}
+```
+
+### Customer Groups with Segments -> CustomerGroupSegementsIndex
+```json
+{
+   "customerGroupId":1,
+   "segments":[
+      {
+         "segmentId":1,
+         "segmentCount":1
+      }
+   ]
+}
 ```
