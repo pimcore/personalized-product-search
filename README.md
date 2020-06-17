@@ -76,3 +76,5 @@ class FactoryPersonalizationAdapterCustomerIdProvider implements Personalization
 ### Using the ETL mechanism programatically, via commands and via cron jobs
 [ETL mechanism usage](./doc/ETL.md)
 
+## Load test and architecture
+A detailed documentation for the architecture is available under the [following link](./doc/Architecture.md). As well you can find detailes for the load tests under [this link](./doc/LoadTesting.md).
