@@ -98,6 +98,8 @@ First, the used decorators and adapters need to be injected, which is not shown 
 
 For debug purposes, it might be interesting what the modifications (segments and boosting value for each adapter) looks like. For this case the method *getDebugInfo* exists.
 
+More detailed information can be found [here](./doc/Adapters.md) (adapters) and [here](./doc/Decorators.md) (decorators)
+
 ### Using the ETL mechanism
 The ETL mechanism can be invoked in 3 ways.
 
