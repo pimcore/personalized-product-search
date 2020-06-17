@@ -4,13 +4,14 @@
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
 use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider as CustomerIdProvider;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\RelevantProductIndexAccessProvider;
+use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 
 class RelevantProductsAdapter extends AbstractAdapter
 {
+    private static $ADDITIONAL_WEIGHT = 8;
 
     /**
-     * @var RelevantProductIndexAccessProvider
+     * @var CustomerGroupIndexAccessProviderInterface
      */
     private $relevantProductIndex;
 
@@ -19,7 +20,7 @@ class RelevantProductsAdapter extends AbstractAdapter
      */
     private $customerIdProvider;
 
-    public function __construct(RelevantProductIndexAccessProvider $relevantProductIndex, CustomerIdProvider $customerIdProvider)
+    public function __construct(CustomerGroupIndexAccessProviderInterface $relevantProductIndex, CustomerIdProvider $customerIdProvider)
     {
         $this->relevantProductIndex = $relevantProductIndex;
         $this->customerIdProvider = $customerIdProvider;
@@ -45,7 +46,7 @@ class RelevantProductsAdapter extends AbstractAdapter
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight
+                'weight' => $segmentCount * $weight * RelevantProductsAdapter::$ADDITIONAL_WEIGHT
             ];
         }
 
@@ -62,5 +63,34 @@ class RelevantProductsAdapter extends AbstractAdapter
         ];
 
         return $relevantProductQuery;
+    }
+
+    /**
+     * Get boosting values
+     * @param float $weight
+     * @param string $boostMode
+     * @return array
+     */
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    {
+        $customerId = $this->customerIdProvider->getCustomerId();
+        $response = $this->relevantProductIndex->fetchSegments($customerId);
+
+        $info = [
+            'adapter' => get_class($this),
+            'boostMode' => $boostMode,
+            'segments' => []
+        ];
+
+        foreach($response as $segment) {
+            $segmentId = $segment['segmentId'];
+            $segmentCount = $segment['segmentCount'];
+            $info['segments'] = [
+                'segmentId' => $segmentId,
+                'weight' => $segmentCount * $weight
+            ];
+        }
+
+        return $info;
     }
 }

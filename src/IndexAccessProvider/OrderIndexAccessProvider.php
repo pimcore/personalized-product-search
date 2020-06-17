@@ -53,6 +53,12 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
         return $response[0]['_source']['segments'];
     }
 
+    /**
+     * Adds the document to the index with the specified ID
+     * @param int $documentId
+     * @param object $body
+     * @return mixed
+     */
     public function index(int $documentId, object $body)
     {
         $params = [

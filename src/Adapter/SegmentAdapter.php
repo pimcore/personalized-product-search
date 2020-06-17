@@ -57,4 +57,29 @@ class SegmentAdapter extends AbstractAdapter
 
         return $segmentQuery;
     }
+
+    /**
+     * Get boosting values
+     * @param float $weight
+     * @param string $boostMode
+     * @return array
+     */
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    {
+        $info = [
+            'adapter' => get_class($this),
+            'boostMode' => $boostMode,
+            'segments' => []
+        ];
+
+        $segments = $this->segmentTracker->getAssignments($this->visitorInfoStorage->getVisitorInfo());
+        foreach ($segments as $segmentId => $count) {
+            $info['segments'] = [
+                'segmentId' => $segmentId,
+                'weight' => $count * $weight
+            ];
+        }
+
+        return $info;
+    }
 }

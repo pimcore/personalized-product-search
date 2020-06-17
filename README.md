@@ -73,8 +73,66 @@ class FactoryPersonalizationAdapterCustomerIdProvider implements Personalization
 }
 ```
 
-### Using the ETL mechanism programatically, via commands and via cron jobs
-[ETL mechanism usage](./doc/ETL.md)
+### Injecting adapters/decorators
+Default adapters (*SegmentAdapter*, *PurchaseHistoryAdapter* and *RelevantProductsAdapter*) and default decorators (*EqualWeightDecorator*, *PerformanceMeasurementDecorator*) that are shipped with the Personalization-Bundle are already available via dependency injection. Just make sure all necessary interfaces are implemented and available as explained above.
+
+### Personalizing queries
+Adapters modify existing queries. The following example should give an overview of how decorators and adapters can be used:
+```php
+$queryKey = 'searchTerm';
+
+//$personalizationDecorator = new PerformanceMeasurementDecorator(new AdapterPerformanceIndexAccessProvider());
+$personalizationDecorator = new EqualWeightDecorator();
+$personalizationDecorator
+    ->addAdapter($relevantProductAdapter);
+    //->addAdapter($purchaseHistoryAdapter);
+    //->addAdapter($segmentAdapter);
+$query = $personalizationDecorator->addPersonalization($query);
+$productListing->addQueryCondition($query, $queryKey);
+
+echo '<pre>';
+print_r($personalizationDecorator->getDebugInfo());
+echo '</pre>';
+```
+First, the used decorators and adapters need to be injected, which is not shown in the code snippet. Then a decorator is defined to manage the underlying adapters. Those can easily be added to the decorator using the *addAdapter* method. After adding adapters *addPersonalization* can be called for the decorator. It takes the Elasticsearch-query as a parameter. This method returns the modified, personalized, query which can then be executed.
+
+For debug purposes, it might be interesting what the modifications (segments and boosting value for each adapter) looks like. For this case the method *getDebugInfo* exists.
+
+More detailed information can be found [here](./doc/Adapters.md) (adapters) and [here](./doc/Decorators.md) (decorators)
+
+### Using the ETL mechanism
+The ETL mechanism can be invoked in 3 ways.
+
+#### Programatically through interfaces which can be injected
+Extract purchase history for all customers:
+
+`purchaseHistoryProvider->updateOrderIndexFromOrderDb()`
+
+Or just for a single customer:
+
+`purchaseHistoryProvider->fillOrderIndex(customer)`
+
+Updating the customer-group assignments:
+
+`customerGroupProvider->updateCustomerGroupAndSegmentsIndicesFromOrderDb()`
+#### Via executing a command on the command line
+`./bin/console personalizedsearch:start-etl ExampleArgument`
+
+The argument *ExampleArgument* is optional. When no argument is given, the ETL is executed for purchase history and relevant products, otherwise only for the given one. The value for the argument can be *PurchaseHistory* or *CustomerGroup*.
+#### Via creating cron job entries to automate the invocation
+For running the whole ETL every hour, following entry has to be made in the cron tab:
+
+`* */1 * * * /home/pimcoredemo/www/bin/console personalizedsearch:start-etl >> /tmp/personalizedsearch-etl.log`
+
+For more details about the ETL and its usage see [ETL](./doc/ETL.md).
+
+### Implementing a custom adapter
+A custom adapter should extend *AbstractAdapter* which implements the *AdapterInterface*. There are two methods to implement: *addPersonalization* and *getDebugInfo*. The goal of both methods is to create information on how certain segments are boosted. In *addPersonalization* this information is used to create so called [function scores](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html) that are added to the query whereas in *getDebugInfo* the boosting information is returned. For detailed information on what such an implementation could look like take a look at the default adapters and the more [detailed adapter documentation](./doc/Adapters.md).
+
+Finally, the adapter should be added to *services.yml* to make it available via dependency injection, just like the default ones. The new entry in the *services.yml* should look something like this:
+```yml
+AppBundle\Personalization\Adapter\YourAdapter: ~
+```
 
 ## Load test and architecture
 A detailed documentation for the architecture is available under the [following link](./doc/Architecture.md). As well you can find detailes for the load tests under [this link](./doc/LoadTesting.md).

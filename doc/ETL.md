@@ -1,12 +1,12 @@
 # ETL mechanism
 
-The **ETL mechanism** is responsible for providing the necessary data in the ES indices to ensure correct search results when using the concrete adapters.
+The ETL mechanism is responsible for providing the necessary data in the ES indices to ensure correct search results when using the concrete adapters.
 
 ## ETL mechanism for the purchase history adapter
 
 By using the following interface, either the purchase information of all customers or only specific ones can be extracted from the Order Database in order to fill the ES index.
 
-```
+```php
 interface PurchaseHistoryInterface
 {
     public function fillOrderIndex(CustomerInfo $customerInfo);
@@ -20,7 +20,7 @@ In detail, the segments of a customer's purchased products will be saved into th
 ## ETL mechanism for the relevant products adapter
 
 As for purchase history ETL there also exists an interface for the relevant products ETL:
-```
+```php
 interface CustomerGroupInterface
 {
     public function updateCustomerGroupAndSegmentsIndicesFromOrderDb();
@@ -40,14 +40,14 @@ Our implemented strategy to creating the customer groups and assigning the custo
 In this section will be described, how to use the ETL mechanism in its different ways.
 
 ### Programatically
-To invoke the ETL programatically, the interfaces `PurchaseHistoryInterface` and `CustomerGroupInterface` can be used to fill the ES indices.
+To invoke the ETL programatically, the interfaces `PurchaseHistoryInterface` and `CustomerGroupInterface` can be used to fill the ES indices. Both interfaces can be injected through the Dependency Injection Container, the concrete implementation which is used is stated in the services.yml, but at this point there exists only one implementation for each interface.
 
 ### Command
-To run the **ETL mechanism** from the console, navigate to the folder containing the console
+To run the ETL mechanism from the console, navigate to the folder containing the console
 
  `/home/pimcoredemo/www` 
  
- and enter 
+ and enter the following command:
  
  `./bin/console personalizedsearch:start-etl`.
 
