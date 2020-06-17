@@ -144,7 +144,7 @@ An entry looks as follows in Elasticsearch:
 ```
 
 The gathered data can be used for analysations directly in Kibana. An example of a visualization of the overall adapter performances (min, max, average) is shown below:
-[ExampleAdapterComparison](./img/example_adapter_comparison.png)
+![ExampleAdapterComparison](./img/adapter_performances_visalization_example.png)
 
 ### Usage
 ```
