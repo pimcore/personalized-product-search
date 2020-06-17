@@ -14,6 +14,9 @@ Since every decorator implements `AdapterInterface` our abstract class `Abstract
 `addPersonalization()` executes each adapter to add every adapters personalization to the Elasticsearch query.
 
 `getDebugInfo()` collects segment information of the current personalization from each adapter and returns them.
+Calling this method on our predefined decorator returns the following data structure containing an array of adapter segment information:
+
+![Data structure returned from a decorator](./img/debug_info_example_decorator.png)
 
 At last an abstract method `invokeAdapter()` exists which has to be overwritten by a concrete class. This method defines what happens if an adapter gets invoked.
 
