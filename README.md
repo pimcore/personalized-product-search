@@ -125,7 +125,7 @@ For running the whole ETL every hour, following entry has to be made in the cron
 For more details about the ETL and its usage see [ETL](./doc/ETL.md).
 
 ### Implementing a custom adapter
-A custom adapter should extend *AbstractAdapter* which implements the *AdapterInterface*. There are two methods to implement: *addPersonalization* and *getDebugInfo*. The goal of both methods is to create information on how certain segments are boosted. In *addPersonalization* this information is used to create so called [function scores](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html) that are added to the query whereas in *getDebugInfo* the boosting information is returned. For detailed information on what such an implementation could look like take a look at the default adapters.
+A custom adapter should extend *AbstractAdapter* which implements the *AdapterInterface*. There are two methods to implement: *addPersonalization* and *getDebugInfo*. The goal of both methods is to create information on how certain segments are boosted. In *addPersonalization* this information is used to create so called [function scores](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html) that are added to the query whereas in *getDebugInfo* the boosting information is returned. For detailed information on what such an implementation could look like take a look at the default adapters and the more [detailed adapter documentation](./doc/Adapters.md).
 
 Finally, the adapter should be added to *services.yml* to make it available via dependency injection, just like the default ones. The new entry in the *services.yml* should look something like this:
 ```yml
