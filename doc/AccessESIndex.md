@@ -5,7 +5,7 @@ To access the an ES index the official PHP low-level [client](https://github.com
 ```php
 $esClient = ClientBuilder::create()->build();
 ```
-The client can then execute querys with different methods (i.e. create, count, delete, get,...). What such queries can look like is already documented [here](home/How to create an Elasticsearch order index in Kibana). Below is short sample code to show how to retrieve a document with id _$someId_ from index _index_name_. The name of the Order Index is _``order_segments``_.
+The client can then execute querys with different methods (i.e. create, count, delete, get,...). What such queries can look like is documented in the [official documentation](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-create-index.html). Below is short sample code to show how to retrieve a document with id _$someId_ from index _index_name_. The name of the Order Index is _``order_segments``_.
 
 ```php
 $params = [
@@ -33,7 +33,7 @@ A complete example with the creation of the _ClientBuilder_ is the _OrderIndexAc
 
 ## Architecture
 
-![Architecture to access indices](./img/architecture_index_access.PNG)
+![Architecture to access indices](./img/adapter/architecture_index_access.jpeg)
 
 ### IndexAccessProviderInterface
 The interface provides access to a data storage which contains segments for a certain id. In general, this interface is designed to work with different indices as well as different databases. It features a method to store data which takes a documentId and a body. The documentId is needed to distinguish the data sets (body) added. The body contains the data to be stored. What this data looks like depends on the actual implementation of the interface.

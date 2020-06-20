@@ -26,64 +26,46 @@ The goal of unit tests is to prove that the smallest unit of code behaves exactl
 - Assert interaction between the system under test and its collaborators
 
 ## SampleTest
-Following example shows what a very simple test file could look like. For more informations about mocking classes take a look at the [documentation](https://phpunit.readthedocs.io/en/9.1/test-doubles.html).
+Following example shows what a very simple test file for the `SegmentBasedAdapter` could look like. `$queryRed` represents the original Elasticsearch query whereas `$expectedSegmentBoostedQueryRed` represents the query with the expected boosting. For more informations about mocking classes take a look at the [documentation](https://phpunit.readthedocs.io/en/9.1/test-doubles.html).
 ```php
-namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests;
+namespace Pimcore\Bundle\PersonalizedSearchBundle\Tests\Adapter;
 
+use CustomerManagementFrameworkBundle\Targeting\SegmentTracker;
 use PHPUnit\Framework\TestCase;
+use Pimcore\Bundle\PersonalizedSearchBundle\Adapter\SegmentAdapter;
+use Pimcore\Targeting\VisitorInfoStorage;
 
-class SampleTest extends TestCase
+class SegmentAdapterTest extends TestCase
 {
-
-    protected function setUp() {
-    }
-
-    public function testAdd() {
-        $this->assertEquals(15, 10 + 5);
-    }
-
-    public function testStub() {
-        // Create a stub for the OrderIndexAccessProvider class.
-        $stub = $this
-            -> getMockBuilder("OrderIndexAccessProvider")
-            -> setMethods(['fetchSegments'])
-            -> getMock();
-
-        // Configure the stub.
-        $stub->method('fetchSegments')
-            ->willReturn([
-                (object) [
-                    "segmentId" => 983,
-                    "segmentCount" => 1
-                ],
-                (object) [
-                    "segmentId" => 963,
-                    "segmentCount" => 2
-                ]
-            ]);
-
-        $this->assertSame(1, $stub->fetchSegments(1021)[0]->segmentCount);
-    }
-
-    /**
-     * @dataProvider addDataProvider
-     */
-    public function testAddWithProvider(int $a, int $b, int $expected)
+    public function testSegmentBasedAdapter()
     {
-        $this->assertEquals($expected, $a + $b);
+        $queryRed = array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), );
+
+        $expectedSegmentBoostedQueryRed = array ( 'function_score' => array ( 'query' => array ( 'multi_match' => array ( 'query' => 'red', 'type' => 'cross_fields', 'operator' => 'and', 'fields' => array ( 0 => 'attributes.name^4', 1 => 'attributes.name.analyzed', 2 => 'attributes.name.analyzed_ngram', 3 => 'attributes.manufacturer_name^3', 4 => 'attributes.manufacturer_name.analyzed', 5 => 'attributes.manufacturer_name.analyzed_ngram', 6 => 'attributes.color', 7 => 'attributes.carClass', ), ), ), 'functions' => array ( 0 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 860, ), ), 'weight' => 1.0, ), 1 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 966, ), ), 'weight' => 6.0, ), 2 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 967, ), ), 'weight' => 6.0, ), 3 => array ( 'filter' => array ( 'match' => array ( 'relations.segments' => 968, ), ), 'weight' => 6.0, ), ), 'boost_mode' => 'multiply', ), );
+
+        $segmentAdapter = $this->constructSegmentAdapter();
+        $actualSegmentBoostedQueryRed = $segmentAdapter->addPersonalization($queryRed);
+
+        self::assertEquals($expectedSegmentBoostedQueryRed, $actualSegmentBoostedQueryRed);
     }
 
-    public function addDataProvider(): array
+    private function constructSegmentAdapter() : SegmentAdapter
     {
-        return [
-            [1, 2, 3],
-            [10, 5, 15],
-            [-5, 5, 0],
-            [5, -5, 0],
-            [0, 10, 10],
-            [-50, -50, -100],
-            [-50, 10, -40]
-        ];
+        $visitorInfoStorage = $this
+            ->getMockBuilder(VisitorInfoStorage::class)
+            ->setMethods(['getVisitorInfo'])
+            ->getMock();
+        $visitorInfoStorage->method('getVisitorInfo')
+            ->willReturn(null);
+
+        $segmentTracker = $this
+            ->getMockBuilder(SegmentTracker::class)
+            ->setMethods(['getAssignments'])
+            ->getMock();
+        $segmentTracker->method('getAssignments')
+            ->willReturn(array ( 860 => 1, 966 => 6, 967 => 6, 968 => 6, ));
+
+        return new SegmentAdapter($visitorInfoStorage, $segmentTracker);
     }
 }
 ```

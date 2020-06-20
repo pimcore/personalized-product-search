@@ -1,13 +1,15 @@
 # Decorator implementation details
 
 A *decorator* is responsible for executing multiple adapters at once and can influence the weighting of each adapter.
+Decorators implement the composite pattern which means that a group of objects are treated the same way as a single instance of the same type of object.
+This allows you to nest adapters as well as other decorators within a decorator.
 
 In our bundle one decorator is predefined called *EqualWeightDecorator*. This decorator weights all adapters the same.
 
 ## AbstractDecorator
 Since our decorator should be used like an adapter every decorator implements the `AdapterInterface. 
 
-`AbstractDecorator` implements `AdapterInterface` and defines the basic functionality of each decorator. Internally added adapters are stored in an array. Since the method `addAdapter()` returns our decorator this methods are chainable.
+`AbstractDecorator` implements `AdapterInterface` and defines the basic functionality of each decorator. Internally added adapters are stored in an array. Since the method `addAdapter()` returns our decorator this methods are chainable. This functionality also implements the iterator pattern since all adapters are invoked calling `addPersonalization()`.
 
 Since every decorator implements `AdapterInterface` our abstract class `AbstractDecorator` defines the two methods `addPersonalization()` and `getDebugInfo()`.
 
@@ -16,7 +18,7 @@ Since every decorator implements `AdapterInterface` our abstract class `Abstract
 `getDebugInfo()` collects segment information of the current personalization from each adapter and returns them.
 Calling this method on our predefined decorator returns the following data structure containing an array of adapter segment information:
 
-![Data structure returned from a decorator](./img/debug_info_example_decorator.png)
+![Data structure returned from a decorator](./img/decorator/debug_info_example_decorator.png)
 
 At last an abstract method `invokeAdapter()` exists which has to be overwritten by a concrete class. This method defines what happens if an adapter gets invoked.
 
@@ -74,7 +76,7 @@ class EqualWeightDecorator extends AbstractDecorator
 ```
 
 ## PerformanceMeasurementDecorator
-The *PerformanceMeasurementDecorator* simply measures time it takes for an adapter to execute the *addPersonalization* method. The resulting information is then stored in an Elasticsearch index. However, this index is not created automatically and must be created manually as shown below.
+The `PerformanceMeasurementDecorator` simply measures time it takes for an adapter to execute the `addPersonalization` method. The resulting information is then stored in an Elasticsearch index. However, this index is not created automatically and must be created manually as shown below.
 
 ### Adapter implementation
 Since we extend from AbstractDecorator which defines the abstract method invokeAdapter we can intercept the adapter calls:
@@ -144,7 +146,7 @@ An entry looks as follows in Elasticsearch:
 ```
 
 The gathered data can be used for analysations directly in Kibana. An example of a visualization of the overall adapter performances (min, max, average) is shown below:
-![ExampleAdapterComparison](./img/adapter_performances_visalization_example.png)
+![ExampleAdapterComparison](./img/decorator/adapter_performances_visalization_example.png)
 
 ### Usage
 ```

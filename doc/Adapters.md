@@ -166,7 +166,7 @@ Array
 ## Adapter interface
 The `AdapterInterface` defines two methods:
 * `addPersonalization()`: Augments the query with the corresponding personalization code.
-* `getDebugInfo()`: Returns information based on the current personalization. Our predefined adapters return the following data structure when calling `getDebugInfo()`: ![Data structure returned from an adapter](./img/debug_info_example_adapter.png)
+* `getDebugInfo()`: Returns information based on the current personalization. Our predefined adapters return the following data structure when calling `getDebugInfo()`: ![Data structure returned from an adapter](./img/adapter/debug_info_example_adapter.png)
 
 ```php
 interface AdapterInterface
@@ -193,8 +193,100 @@ use CustomerManagementFrameworkBundle\Targeting\SegmentTracker;
 use Pimcore\Targeting\VisitorInfoStorage;
 ```
 
-to query all assigned segments of the current visitor. This segments represent the browsing behaviour of the user on the web shop.
+to query all assigned segments of the current visitor.
+This segments represent the browsing behaviour of the user on the web shop.
 Having this information we can boost our query and therfore order products which the user is more interested in at the beginning.
+
+To show how our adapter concept works we first create a class which extends `AbstractAdapter`.
+In our case the following implementation reflects the contained `SegmentAdapter`. In the constructor we inject the necessary services which are used so that we can query user segments and augment the query.
+
+Next we need to implement the methods `addPersonalization()` and `getDebugInfo()` which are defined in the `AdapterInterface`.
+
+Since we need to query all segments from the current site visitor we first use the `VisitorInfoStorage` class to get information about the current visitor. Using the `SegmentTracker` we can now read the assigned segments of the current visitor. This information is internally extracted from the cookie.
+
+The function `addPersonalization()` takes the `query` and optional a `weighting` and a `boostMode`. The query is an array data structure which represents the Elasticsearch query. This query is wrapped in a `function_score` and uses every segment to generate functions for boosting products. For further information about boosting a query please visit the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html). At last we return the modified query.
+
+The function `getDebugInfo()` is for debugging purposes and yields information about all segments used during the personalization process for this adapter.
+
+```php
+class SegmentAdapter extends AbstractAdapter
+{
+    /**
+     * @var VisitorInfoStorage
+     */
+    private $visitorInfoStorage;
+
+    /**
+     * @var SegmentTracker
+     */
+    private $segmentTracker;
+
+    /**
+     * SegmentAdapter constructor.
+     * @param VisitorInfoStorage $visitorInfoStorage
+     * @param SegmentTracker $segmentTracker
+     */
+    function __construct(VisitorInfoStorage $visitorInfoStorage, SegmentTracker $segmentTracker) {
+        $this->visitorInfoStorage = $visitorInfoStorage;
+        $this->segmentTracker = $segmentTracker;
+    }
+
+    /**
+     * Adds boosting based on user segments
+     * @param array $query
+     * @param float $weight
+     * @param string $boostMode
+     * @return array
+     */
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
+    {
+        $functions = [];
+
+        $segments = $this->segmentTracker->getAssignments($this->visitorInfoStorage->getVisitorInfo());
+        foreach ($segments as $segmentId => $count) {
+            $functions[] = [
+                'filter' => ['match' => ['relations.segments' => $segmentId]],
+                'weight' => $count * $weight
+            ];
+        }
+
+        $segmentQuery = [
+            'function_score' => [
+                'query' => $query,
+                'functions' => $functions,
+                'boost_mode' => $boostMode
+            ]
+        ];
+
+        return $segmentQuery;
+    }
+
+    /**
+     * Get boosting values
+     * @param float $weight
+     * @param string $boostMode
+     * @return array
+     */
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    {
+        $info = [
+            'adapter' => get_class($this),
+            'boostMode' => $boostMode,
+            'segments' => []
+        ];
+
+        $segments = $this->segmentTracker->getAssignments($this->visitorInfoStorage->getVisitorInfo());
+        foreach ($segments as $segmentId => $count) {
+            $info['segments'] = [
+                'segmentId' => $segmentId,
+                'weight' => $count * $weight
+            ];
+        }
+
+        return $info;
+    }
+}
+```
 
 ## PurchaseHistoryAdapter
 The purchase history adapter uses:
@@ -208,6 +300,32 @@ An implementation of the `PersonalizationAdapterCustomerIdProvider` defines how 
 
 One Elasticsearch index (`order_segments`) is necessary to fetch the users segments.
 
+### OrderSegmentsIndex data structure - Document for customer order segments
+For each customer a document exists which contains all segments extracted from their orders.
+The `segmentCount` property defines the weighting of a certain segment, for example when the user buys multiple products of the same brand.
+```json
+{
+  "_index": "order_segments",
+  "_type": "_doc",
+  "_id": "1018",
+  "_version": 1,
+  "_score": 1,
+  "source": {
+    "customerId": 1018,
+    "segments": [
+      {
+        "segmentId": 930,
+        "segmentCount": 1
+      },
+      {
+        "segmentId": 931,
+        "segmentCount": 2
+      }
+    ]
+  }
+}
+```
+
 ## RelevantProductsAdapter
 The relevant products adapter uses:
 
@@ -220,23 +338,53 @@ An implementation of the `PersonalizationAdapterCustomerIdProvider` defines how 
 
 Two elastic search indices are necessary. One for assigning a Customer to a Customer Group (`customergroup`) and one for assigning all Customer Groups to Segments (`customergroup_segments`).
 
-### Customer assigned to CustomerGroup -> CustomerGroupIndex
+### CustomerGroupIndex data structure - Customer assigned to customer group
+The first index represents the assigment of every customer to a customer group.
+
 ```json
 {
-   "customerId":1,
-   "customerGroupId": 1
+  "_index": "customergroup",
+  "_type": "_doc",
+  "_id": "1018",
+  "_version": 1,
+  "_score": 1,
+  "_source": {
+    "customerId": 1018,
+    "customerGroupId": 1
+  }
 }
 ```
 
-### Customer Groups with Segments -> CustomerGroupSegementsIndex
+### CustomerGroupSegementsIndex data structure - Customer groups containing segments
+The second index stores the segments for each customer group. The indices are connected through the `customerGroupId`.
+
 ```json
 {
-   "customerGroupId":1,
-   "segments":[
+  "_index": "customergroup_segments",
+  "_type": "_doc",
+  "_id": "1",
+  "_version": 1,
+  "_score": 1,
+  "_source": {
+    "customerGroupId": 1,
+    "segments": [
       {
-         "segmentId":1,
-         "segmentCount":1
+        "segmentId": 963,
+        "segmentCount": 5
+      },
+      {
+        "segmentId": 985,
+        "segmentCount": 4
+      },
+      {
+        "segmentId": 991,
+        "segmentCount": 3
+      },
+      {
+        "segmentId": 999,
+        "segmentCount": 2
       }
-   ]
+    ]
+  }
 }
 ```
