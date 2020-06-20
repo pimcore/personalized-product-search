@@ -1,0 +1,107 @@
+@startuml
+namespace Pimcore.PersonalizedSearch {
+
+	interface Adapter
+    interface IndexAccessProvider
+	interface PersonalizationAdapterCustomerIdProvider
+
+	abstract class AbstractAdapter
+	abstract class AbstractDecorator
+
+	Adapter : +personalizeSearch(array query, float weight = 1, string boostMode = "multiply"): array
+	AbstractDecorator : -array adapters
+	AbstractDecorator : #invokeAdapter(Adapter adapter, array query): array
+
+	AbstractDecorator *-- Adapter
+
+	class SegmentAdapter
+	class PurchaseHistoryAdapter
+	class RelevantProductsAdapter
+    class OrderIndexAccessProvider
+    class EqualWeightDecorator
+	class CustomWeightDecorator
+	class CustomerGroupIndexAccessProvider
+
+    Adapter <|-- AbstractAdapter
+	Adapter <|-- AbstractDecorator
+	AbstractAdapter <|-- SegmentAdapter
+	AbstractAdapter <|-- PurchaseHistoryAdapter
+	AbstractAdapter <|-- RelevantProductsAdapter
+	AbstractDecorator <|-- EqualWeightDecorator
+	AbstractDecorator <|-- CustomWeightDecorator
+    IndexAccessProvider <|-- OrderIndexAccessProvider
+	IndexAccessProvider <|-- CustomerGroupIndexAccessProvider
+
+	SegmentAdapter --> Pimcore.Core.SegmentTracker
+	SegmentAdapter --> Pimcore.Core.VisitorInfoStorage
+
+    SegmentAdapter --> Pimcore.ElasticSearchIndex.ProductIndex
+    PurchaseHistoryAdapter --> IndexAccessProvider
+    OrderIndexAccessProvider --> Pimcore.ElasticSearchIndex.OrderIndex
+	CustomerGroupIndexAccessProvider --> Pimcore.ElasticSearchIndex.CustomerGroupIndex
+	CustomerGroupIndexAccessProvider --> Pimcore.ElasticSearchIndex.CustomerGroupSegmentsIndex
+	RelevantProductsAdapter --> IndexAccessProvider
+
+	PurchaseHistoryAdapter --> PersonalizationAdapterCustomerIdProvider
+	RelevantProductsAdapter --> PersonalizationAdapterCustomerIdProvider
+
+}
+
+namespace Pimcore.ElasticSearchIndex {
+    
+    class ProductIndex
+    class OrderIndex
+    class CustomerGroupIndex
+    class CustomerGroupSegmentsIndex
+
+}
+
+namespace Pimcore.Core {
+
+    class Customer
+
+	interface Getter
+
+	interface SegmentTracker
+	interface VisitorInfoStorage
+
+}
+
+namespace Pimcore.WebshopSpecific {
+
+	class CustomerImpl
+
+	CustomerImpl --> Pimcore.Core.SegmentTracker
+	CustomerImpl --> Pimcore.Core.VisitorInfoStorage
+
+	Pimcore.PersonalizedSearch.PersonalizationAdapterCustomerIdProvider <|-- CustomerImpl
+
+}
+
+namespace Pimcore.PersonalizedSearch.ExtractTransformLoad {
+
+	interface PurchaseHistory
+	interface CustomerGroup
+
+    class PurchaseHistoryProvider
+    class CustomerGroupProvider
+	class CustomerInfo
+	class SegmentInfo
+
+    PurchaseHistory <|-- PurchaseHistoryProvider
+    CustomerGroup <|-- CustomerGroupProvider
+
+    PurchaseHistoryProvider --> Pimcore.Core.OrderDatabase
+	PurchaseHistoryProvider --> CustomerInfo
+	PurchaseHistoryProvider --> SegmentInfo
+	CustomerGroupProvider --> CustomerInfo
+	CustomerGroupProvider --> SegmentInfo
+    CustomerGroupProvider --> Pimcore.Core.OrderDatabase
+    PurchaseHistoryProvider --> Pimcore.PersonalizedSearch.IndexAccessProvider
+    PurchaseHistoryProvider --> Pimcore.Core.Getter
+    PurchaseHistoryProvider --> Pimcore.Core.Customer
+    CustomerGroupProvider --> Pimcore.Core.Customer
+	CustomerGroupProvider --> Pimcore.PersonalizedSearch.IndexAccessProvider
+
+}
+@enduml
