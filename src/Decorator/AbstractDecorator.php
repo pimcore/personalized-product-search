@@ -7,6 +7,9 @@ use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\ProductList\ProductList
 
 abstract class AbstractDecorator implements AdapterInterface
 {
+    /**
+     * @var AdapterInterface[]
+     */
     private $adapters;
 
     public function __construct(array $adapters = array())

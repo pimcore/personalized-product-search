@@ -3,6 +3,7 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
+use CustomerManagementFrameworkBundle\SegmentManager\SegmentManagerInterface;
 use CustomerManagementFrameworkBundle\Targeting\SegmentTracker;
 use Pimcore\Targeting\VisitorInfoStorage;
 
@@ -18,12 +19,15 @@ class SegmentAdapter extends AbstractAdapter
      */
     private $segmentTracker;
 
+
     /**
      * SegmentAdapter constructor.
      * @param VisitorInfoStorage $visitorInfoStorage
      * @param SegmentTracker $segmentTracker
+     * @param SegmentManagerInterface $segmentManager
      */
-    function __construct(VisitorInfoStorage $visitorInfoStorage, SegmentTracker $segmentTracker) {
+    function __construct(VisitorInfoStorage $visitorInfoStorage, SegmentTracker $segmentTracker, SegmentManagerInterface $segmentManager) {
+        parent::__construct($segmentManager);
         $this->visitorInfoStorage = $visitorInfoStorage;
         $this->segmentTracker = $segmentTracker;
     }
@@ -74,8 +78,9 @@ class SegmentAdapter extends AbstractAdapter
 
         $segments = $this->segmentTracker->getAssignments($this->visitorInfoStorage->getVisitorInfo());
         foreach ($segments as $segmentId => $count) {
-            $info['segments'] = [
+            $info['segments'][] = [
                 'segmentId' => $segmentId,
+                'segmentName' => $this->getSegmentName($segmentId),
                 'weight' => $count * $weight
             ];
         }
