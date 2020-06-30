@@ -104,7 +104,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
         foreach ($response as $segment) {
             $segmentId = $segment['segmentId'];
             $segmentCount = $segment['segmentCount'];
-            $info['segments'] = [
+            $info['segments'][] = [
                 'segmentId' => $segmentId,
                 'segmentName' => $this->getSegmentName($segmentId),
                 'weight' => $segmentCount * $weight
