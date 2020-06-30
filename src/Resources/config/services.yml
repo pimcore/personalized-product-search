@@ -25,6 +25,16 @@ services:
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupProvider: ~
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupProvider'
 
+    Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider:
+        class: Pimcore\Bundle\PersonalizedSearchBundle\Customer\DefaultCustomerIdProvider
+
+    Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentExtractor\ProductSegmentExtractorInterface:
+        class: Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentExtractor\DummySegmentExtractor
+
+    Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProvider:
+        class: Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\DefaultOrderManagerProvider
+
+
     # ---------------------------------------------------------
     # Register all commands of AppBundle as commands
     # ---------------------------------------------------------
