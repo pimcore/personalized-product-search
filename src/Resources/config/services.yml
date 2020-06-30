@@ -1,5 +1,6 @@
 parameters:
     personalized_search_index_prefix: 'personalized_search_'
+    es_hosts: ['localhost']
 
 services:
     # default configuration for services in *this* file
@@ -18,13 +19,13 @@ services:
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider:
         arguments:
-            - ['%es_client%']
+            - '%es_hosts%'
             - '%personalized_search_index_prefix%'
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider'
 
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider:
         arguments:
-            - ['%es_client%']
+            - '%es_hosts%'
             - '%personalized_search_index_prefix%'
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider'
 
