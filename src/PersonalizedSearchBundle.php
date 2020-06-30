@@ -33,11 +33,6 @@ class PersonalizedSearchBundle extends AbstractPimcoreBundle
     {
         // getVersion() will use this name to read the version from
         // PackageVersions and return a normalized value
-        return 'pimcore/personalized-search';
-    }
-
-    public function getVersion()
-    {
-        return '1.0.0';
+        return 'pimcore/personalized-product-search';
     }
 }
