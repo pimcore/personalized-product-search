@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * Pimcore
+ *
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Pimcore Enterprise License (PEL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
+ *
+ *  @copyright  Copyright (c) Pimcore GmbH (http://www.pimcore.org)
+ *  @license    http://www.pimcore.org/license     GPLv3 and PEL
+ */
+
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
@@ -8,7 +21,6 @@ use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentInfo;
 
 class CustomerGroupIndexAccessProvider extends EsAwareIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
 {
-
     /**
      * @var string
      */
@@ -61,12 +73,11 @@ class CustomerGroupIndexAccessProvider extends EsAwareIndexAccessProvider implem
         $obj = new \stdClass();
         $obj->customerId = $customerGroupAssignment->customerId;
         $obj->customerGroupId = $customerGroupAssignment->customerGroup->customerGroupId;
-        if(!$this->customerGroupExists($customerGroupAssignment->customerGroup->customerGroupId))
-        {
+        if (!$this->customerGroupExists($customerGroupAssignment->customerGroup->customerGroupId)) {
             // create new group if it doesn't exist already
             self::indexByName($customerGroupAssignment->customerGroup->customerGroupId, $customerGroupAssignment->customerGroup, self::$customerGroupIndex);
         }
-        self::indexByName($customerGroupAssignment->customerId, $obj , self::$customerGroupAssignmentIndex);
+        self::indexByName($customerGroupAssignment->customerId, $obj, self::$customerGroupAssignmentIndex);
     }
 
     private function customerGroupExists($customerGroupId)
@@ -104,7 +115,7 @@ class CustomerGroupIndexAccessProvider extends EsAwareIndexAccessProvider implem
 
         $response = $this->esClient->search($params)['hits']['hits'];
 
-        if(sizeof($response) === 0) {
+        if (sizeof($response) === 0) {
             return [];
         }
 
@@ -124,7 +135,7 @@ class CustomerGroupIndexAccessProvider extends EsAwareIndexAccessProvider implem
 
         $response = $this->esClient->search($params)['hits']['hits'];
 
-        if(sizeof($response) === 0) {
+        if (sizeof($response) === 0) {
             return [];
         }
 
@@ -133,28 +144,28 @@ class CustomerGroupIndexAccessProvider extends EsAwareIndexAccessProvider implem
 
     public function dropCustomerGroupAssignmentIndex()
     {
-        if($this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex])) {
+        if ($this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex])) {
             $this->esClient->indices()->delete(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex]);
         }
     }
 
     public function dropCustomerGroupIndex()
     {
-        if($this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupIndex])) {
+        if ($this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupIndex])) {
             $this->esClient->indices()->delete(['index' => $this->indexPrefix . self::$customerGroupIndex]);
         }
     }
 
     public function createCustomerGroupAssignmentIndex()
     {
-        if(!$this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex])) {
+        if (!$this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex])) {
             $this->esClient->indices()->create(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex]);
         }
     }
 
     public function createCustomerGroupIndex()
     {
-        if(!$this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupIndex])) {
+        if (!$this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupIndex])) {
             $this->esClient->indices()->create(['index' => $this->indexPrefix . self::$customerGroupIndex]);
         }
     }

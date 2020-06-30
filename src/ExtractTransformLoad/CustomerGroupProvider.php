@@ -1,7 +1,19 @@
 <?php
 
-namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
+/**
+ * Pimcore
+ *
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Pimcore Enterprise License (PEL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
+ *
+ *  @copyright  Copyright (c) Pimcore GmbH (http://www.pimcore.org)
+ *  @license    http://www.pimcore.org/license     GPLv3 and PEL
+ */
 
+namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentExtractor\ProductSegmentExtractorInterface;
@@ -22,7 +34,8 @@ class CustomerGroupProvider implements CustomerGroupInterface
 
     private const PROCENTUAL_INTERSECTION = 0.6;
 
-    public function __construct(ProductSegmentExtractorInterface $segmentExtractor, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
+    public function __construct(ProductSegmentExtractorInterface $segmentExtractor, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider)
+    {
         $this->segmentExtractor = $segmentExtractor;
         $this->customerGroupIndexAccessProvider = $customerGroupIndexAccessProvider;
     }
@@ -40,7 +53,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
         $this->customerGroupIndexAccessProvider->createCustomerGroupAssignmentIndex();
         $this->customerGroupIndexAccessProvider->createCustomerGroupIndex();
 
-        foreach($customers as $customer) {
+        foreach ($customers as $customer) {
             $this->assignCustomerToCustomerGroup($customer->getId());
         }
     }
@@ -48,6 +61,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
     /**
      * Assigns a customer to a group of similar customers
      * If no group is found, a new one is created
+     *
      * @param int $customerId
      */
     private function assignCustomerToCustomerGroup(int $customerId)
@@ -69,13 +83,11 @@ class CustomerGroupProvider implements CustomerGroupInterface
             $intersection = array_intersect($customerInfoSegmentIds, $customerGroupSegmentIds);
 
             if (sizeof($customerInfoSegmentIds) > 0 && sizeof($customerGroupSegmentIds) > 0) {
-
                 $customerInfoMatchPercentage = sizeof($intersection) / sizeof($customerInfoSegmentIds);
                 $customerGroupMatchPercentage = sizeof($intersection) / sizeof($customerGroupSegmentIds);
 
                 if ($customerInfoMatchPercentage > self::PROCENTUAL_INTERSECTION
-                    && $customerGroupMatchPercentage > self::PROCENTUAL_INTERSECTION)
-                {
+                    && $customerGroupMatchPercentage > self::PROCENTUAL_INTERSECTION) {
                     // assign to existing group
                     $customerGroupAssignment = new CustomerGroupAssignment($customerId, $customerGroup);
                     $this->customerGroupIndexAccessProvider->indexCustomerGroupAssignment($customerGroupAssignment);
@@ -88,10 +100,10 @@ class CustomerGroupProvider implements CustomerGroupInterface
         if (!$isAssigned && sizeof($customerInfoSegmentIds) > 0) {
             // create new group
             $newId = 1;
-            if(sizeof($allCustomerGroups) > 0) {
+            if (sizeof($allCustomerGroups) > 0) {
                 $newId = max(array_map(function ($customerGroups) {
-                        return $customerGroups->customerGroupId;
-                    }, $allCustomerGroups)) + 1;
+                    return $customerGroups->customerGroupId;
+                }, $allCustomerGroups)) + 1;
             }
 
             $customerGroupAssignment = new CustomerGroupAssignment($customerId, new CustomerGroup($newId, $customerInfo->segments));
@@ -101,50 +113,47 @@ class CustomerGroupProvider implements CustomerGroupInterface
 
     /**
      * Gets the purchase history of a customer
+     *
      * @param int $customerId
+     *
      * @return CustomerInfo
      */
     private function getPurchaseHistory(int $customerId): CustomerInfo
     {
         $orderManager = Factory::getInstance()->getOrderManager();
 
-        $orderList =  $orderManager->createOrderList();
+        $orderList = $orderManager->createOrderList();
         $orderQuery = $orderList->getQuery();
 
         $orderList->joinCustomer(\Pimcore\Model\DataObject\Customer::classId());
         $orderQuery->where('customer.o_id = ?', $customerId);
 
-
         $customerInfo = new CustomerInfo($customerId);
 
-        foreach($orderList as $order)
-        {
-            foreach($order->getItems() as $item)
-            {
+        foreach ($orderList as $order) {
+            foreach ($order->getItems() as $item) {
                 $product = $item->getProduct();
 
                 $segments = $this->segmentExtractor->get($product);
 
-                foreach ($segments as $segment)
-                {
+                foreach ($segments as $segment) {
                     $segmentId = $segment->getId();
                     $found = false;
-                    foreach($customerInfo->segments as $e)
-                    {
-                        if($e->segmentId === $segmentId)
-                        {
+                    foreach ($customerInfo->segments as $e) {
+                        if ($e->segmentId === $segmentId) {
                             $e->segmentCount++;
                             $found = true;
                         }
                     }
 
-                    if(!$found){
+                    if (!$found) {
                         $segmentInfo = new SegmentInfo($segmentId, 1);
                         $customerInfo->segments[] = $segmentInfo;
                     }
                 }
             }
         }
+
         return $customerInfo;
     }
 }

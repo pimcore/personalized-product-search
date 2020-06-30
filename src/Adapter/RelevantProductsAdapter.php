@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Pimcore
+ *
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Pimcore Enterprise License (PEL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
+ *
+ *  @copyright  Copyright (c) Pimcore GmbH (http://www.pimcore.org)
+ *  @license    http://www.pimcore.org/license     GPLv3 and PEL
+ */
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
@@ -30,29 +42,31 @@ class RelevantProductsAdapter extends AbstractAdapter
 
     /**
      * Boosts products based on preferences of similar customers
+     *
      * @param array $query
      * @param float $weight
      * @param string $boostMode
+     *
      * @return array
      */
-    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = 'multiply'): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->relevantProductIndex->fetchSegments($customerId);
 
         $functions = [];
 
-        foreach($response as $segment) {
+        foreach ($response as $segment) {
             $segmentId = $segment['segmentId'];
             $segmentCount = $segment['segmentCount'];
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight * RelevantProductsAdapter::$ADDITIONAL_WEIGHT
+                'weight' => $segmentCount * $weight * self::$ADDITIONAL_WEIGHT
             ];
         }
 
-        if(count($functions) == 0) {
+        if (count($functions) == 0) {
             return $query;
         }
 
@@ -69,11 +83,13 @@ class RelevantProductsAdapter extends AbstractAdapter
 
     /**
      * Get boosting values
+     *
      * @param float $weight
      * @param string $boostMode
+     *
      * @return array
      */
-    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = 'multiply'): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->relevantProductIndex->fetchSegments($customerId);
@@ -84,7 +100,7 @@ class RelevantProductsAdapter extends AbstractAdapter
             'segments' => []
         ];
 
-        foreach($response as $segment) {
+        foreach ($response as $segment) {
             $segmentId = $segment['segmentId'];
             $segmentCount = $segment['segmentCount'];
             $info['segments'] = [

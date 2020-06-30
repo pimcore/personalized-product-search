@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Pimcore
+ *
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Pimcore Enterprise License (PEL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
+ *
+ *  @copyright  Copyright (c) Pimcore GmbH (http://www.pimcore.org)
+ *  @license    http://www.pimcore.org/license     GPLv3 and PEL
+ */
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
@@ -31,29 +43,31 @@ class PurchaseHistoryAdapter extends AbstractAdapter
     /**
      * Boosts accessory parts more than cars
      * WARNING: this is a not generic adapter and is specific to the demo app
+     *
      * @param array $query
      * @param float $weight
      * @param string $boostMode
+     *
      * @return array
      */
-    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = "multiply"): array
+    public function addPersonalization(array $query, float $weight = 1.0, string $boostMode = 'multiply'): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->orderIndex->fetchSegments($customerId);
 
         $functions = [];
 
-        foreach($response as $segment) {
+        foreach ($response as $segment) {
             $segmentId = $segment['segmentId'];
             $segmentCount = $segment['segmentCount'];
             $functions[] = [
                 'filter' => [
                     'match' => ['relations.segments' => $segmentId]],
-                'weight' => $segmentCount * $weight * PurchaseHistoryAdapter::$ADDITIONAL_WEIGHT
+                'weight' => $segmentCount * $weight * self::$ADDITIONAL_WEIGHT
             ];
         }
 
-        if(count($functions) == 0) {
+        if (count($functions) == 0) {
             return $query;
         }
 
@@ -70,11 +84,13 @@ class PurchaseHistoryAdapter extends AbstractAdapter
 
     /**
      * Get boosting values
+     *
      * @param float $weight
      * @param string $boostMode
+     *
      * @return array
      */
-    public function getDebugInfo(float $weight = 1.0, string $boostMode = "multiply"): array
+    public function getDebugInfo(float $weight = 1.0, string $boostMode = 'multiply'): array
     {
         $customerId = $this->customerIdProvider->getCustomerId();
         $response = $this->orderIndex->fetchSegments($customerId);
@@ -85,7 +101,7 @@ class PurchaseHistoryAdapter extends AbstractAdapter
             'segments' => []
         ];
 
-        foreach($response as $segment) {
+        foreach ($response as $segment) {
             $segmentId = $segment['segmentId'];
             $segmentCount = $segment['segmentCount'];
             $info['segments'] = [
