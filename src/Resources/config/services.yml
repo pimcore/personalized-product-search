@@ -1,3 +1,6 @@
+parameters:
+    personalized_search_index_prefix: 'personalized_search_'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -13,10 +16,16 @@ services:
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\PurchaseHistoryAdapter: ~
     Pimcore\Bundle\PersonalizedSearchBundle\Adapter\RelevantProductsAdapter: ~
 
-    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider:
+        arguments:
+            - ['%es_client%']
+            - '%personalized_search_index_prefix%'
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider'
 
-    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider: ~
+    Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider:
+        arguments:
+            - ['%es_client%']
+            - '%personalized_search_index_prefix%'
     Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface: '@Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProvider'
 
     Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PurchaseHistoryProvider: ~

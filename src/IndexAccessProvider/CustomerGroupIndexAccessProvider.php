@@ -2,18 +2,12 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
-use Elasticsearch\ClientBuilder;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroup;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\CustomerGroupAssignment;
 use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentInfo;
 
-/**
- * Class RelevantProductIndexAccessProvider
- * @package PersonalizedSearchBundle\IndexAccessProvider
- */
-class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
+class CustomerGroupIndexAccessProvider extends EsAwareIndexAccessProvider implements CustomerGroupIndexAccessProviderInterface
 {
-    private $esClient;
 
     /**
      * @var string
@@ -25,17 +19,10 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
      */
     private static $customerGroupIndex = 'customergroup_segments';
 
-    public function __construct()
-    {
-        if (class_exists('Elasticsearch\\ClientBuilder')) {
-            $this->esClient = ClientBuilder::create()->build();
-        }
-    }
-
     private function indexByName(int $documentId, object $body, string $indexName)
     {
         $params = [
-            'index' => $indexName,
+            'index' => $this->indexPrefix . $indexName,
             'type' => '_doc',
             'id' => $documentId,
             'body' => $body
@@ -46,7 +33,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
     public function fetchCustomerGroups(): array
     {
         $params = [
-            'index' => self::$customerGroupIndex,
+            'index' => $this->indexPrefix . self::$customerGroupIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -85,7 +72,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
     private function customerGroupExists($customerGroupId)
     {
         $params = [
-            'index' => self::$customerGroupIndex,
+            'index' => $this->indexPrefix . self::$customerGroupIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -104,7 +91,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
     public function fetchSegments(int $customerId): array
     {
         $params = [
-            'index' => self::$customerGroupAssignmentIndex,
+            'index' => $this->indexPrefix . self::$customerGroupAssignmentIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -124,7 +111,7 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
         $customerGroupId = $response[0]['_source']['customerGroupId'];
 
         $params = [
-            'index' => self::$customerGroupIndex,
+            'index' => $this->indexPrefix . self::$customerGroupIndex,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -146,29 +133,29 @@ class CustomerGroupIndexAccessProvider implements CustomerGroupIndexAccessProvid
 
     public function dropCustomerGroupAssignmentIndex()
     {
-        if($this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex])) {
-            $this->esClient->indices()->delete(['index' => self::$customerGroupAssignmentIndex]);
+        if($this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex])) {
+            $this->esClient->indices()->delete(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex]);
         }
     }
 
     public function dropCustomerGroupIndex()
     {
-        if($this->esClient->indices()->exists(['index' => self::$customerGroupIndex])) {
-            $this->esClient->indices()->delete(['index' => self::$customerGroupIndex]);
+        if($this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupIndex])) {
+            $this->esClient->indices()->delete(['index' => $this->indexPrefix . self::$customerGroupIndex]);
         }
     }
 
     public function createCustomerGroupAssignmentIndex()
     {
-        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupAssignmentIndex])) {
-            $this->esClient->indices()->create(['index' => self::$customerGroupAssignmentIndex]);
+        if(!$this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex])) {
+            $this->esClient->indices()->create(['index' => $this->indexPrefix . self::$customerGroupAssignmentIndex]);
         }
     }
 
     public function createCustomerGroupIndex()
     {
-        if(!$this->esClient->indices()->exists(['index' => self::$customerGroupIndex])) {
-            $this->esClient->indices()->create(['index' => self::$customerGroupIndex]);
+        if(!$this->esClient->indices()->exists(['index' => $this->indexPrefix . self::$customerGroupIndex])) {
+            $this->esClient->indices()->create(['index' => $this->indexPrefix . self::$customerGroupIndex]);
         }
     }
 }
