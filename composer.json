@@ -1,5 +1,5 @@
 {
-  "name": "pimcore/personalized-search",
+  "name": "pimcore/personalized-product-search",
   "type": "pimcore-bundle",
   "autoload": {
     "psr-4": {
