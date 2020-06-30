@@ -3,6 +3,7 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\Adapter;
 
+use CustomerManagementFrameworkBundle\SegmentManager\SegmentManagerInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider as CustomerIdProvider;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 
@@ -20,8 +21,9 @@ class RelevantProductsAdapter extends AbstractAdapter
      */
     private $customerIdProvider;
 
-    public function __construct(CustomerGroupIndexAccessProviderInterface $relevantProductIndex, CustomerIdProvider $customerIdProvider)
+    public function __construct(CustomerGroupIndexAccessProviderInterface $relevantProductIndex, CustomerIdProvider $customerIdProvider, SegmentManagerInterface $segmentManager)
     {
+        parent::__construct($segmentManager);
         $this->relevantProductIndex = $relevantProductIndex;
         $this->customerIdProvider = $customerIdProvider;
     }
@@ -87,6 +89,7 @@ class RelevantProductsAdapter extends AbstractAdapter
             $segmentCount = $segment['segmentCount'];
             $info['segments'] = [
                 'segmentId' => $segmentId,
+                'segmentName' => $this->getSegmentName($segmentId),
                 'weight' => $segmentCount * $weight
             ];
         }
