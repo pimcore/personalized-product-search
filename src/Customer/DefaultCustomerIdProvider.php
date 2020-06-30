@@ -33,6 +33,6 @@ class DefaultCustomerIdProvider implements PersonalizationAdapterCustomerIdProvi
         if ($user instanceof AbstractObject) {
             return $user->getId();
         }
-        throw new \Exception('No User Logged In or User no Pimcore Object');
+        return 0; 
     }
 }
