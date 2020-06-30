@@ -3,27 +3,12 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
-use Elasticsearch\ClientBuilder;
-
-/**
- * Class AdapterPerformanceIndexAccessProvider
- * @package PersonalizedSearchBundle\IndexAccessProvider
- */
-class AdapterPerformanceIndexAccessProvider implements IndexAccessProviderInterface
+class AdapterPerformanceIndexAccessProvider extends EsAwareIndexAccessProvider implements IndexAccessProviderInterface
 {
-    private $esClient;
-
     /**
      * @var string
      */
     private static $indexName = 'adapter_performance';
-
-    public function __construct()
-    {
-        if (class_exists('Elasticsearch\\ClientBuilder')) {
-            $this->esClient = ClientBuilder::create()->build();
-        }
-    }
 
     public function fetchSegments(int $customerId): array
     {
@@ -34,7 +19,7 @@ class AdapterPerformanceIndexAccessProvider implements IndexAccessProviderInterf
     public function index(int $documentId, object $body)
     {
         $params = [
-            'index' => self::$indexName,
+            'index' => $this->indexPrefix . self::$indexName,
             'type' => '_doc',
             'body' => $body
         ];

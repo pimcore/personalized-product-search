@@ -22,6 +22,11 @@ For details about the architecture of this bundle please see the [corresponding 
 * Install the ecommerce bundle
 * Install the personalized search bundle like any other pimcore bundle
 
+### Define parameters
+Following two parameters need to be defined in your application (default values are provided, but most probably not suitable): 
+- `personalized_search_index_prefix` - prefix for index names of ETL ES indices (default set to `personalized_search_`)
+- `es_hosts` - array of ES hosts (default set to `['localhost']`)
+
 ### Implement necessary interfaces
 The personalized search bundles needs some application dependent data to work. Therefore some interfaces are provided 
 which must be implemented. Additionally, those implementations must be available for dependency injection.
