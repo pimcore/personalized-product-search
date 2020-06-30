@@ -2,19 +2,29 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
-use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
-use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\IndexAccessProviderInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentExtractor\ProductSegmentExtractorInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\OrderIndexAccessProvider;
 use Pimcore\Model\DataObject;
 
 class PurchaseHistoryProvider implements PurchaseHistoryInterface
 {
-    private $segmentGetter;
+    /**
+     * @var ProductSegmentExtractorInterface
+     */
+    private $segmentExtractor;
+
+    /**
+     * @var PersonalizationOrderManagerProvider
+     */
     private $orderManagerProvider;
+
+    /**
+     * @var OrderIndexAccessProvider
+     */
     private $orderIndexAccessProvider;
 
-    public function __construct(GetterInterface $getter, PersonalizationOrderManagerProvider $orderManagerProvider, OrderIndexAccessProvider $orderIndexAccessProvider) {
-        $this->segmentGetter = $getter;
+    public function __construct(ProductSegmentExtractorInterface $segmentExtractor, PersonalizationOrderManagerProvider $orderManagerProvider, OrderIndexAccessProvider $orderIndexAccessProvider) {
+        $this->segmentExtractor = $segmentExtractor;
         $this->orderManagerProvider = $orderManagerProvider;
         $this->orderIndexAccessProvider = $orderIndexAccessProvider;
     }
@@ -62,7 +72,7 @@ class PurchaseHistoryProvider implements PurchaseHistoryInterface
             {
                 $product = $item->getProduct();
 
-                $segments = $this->segmentGetter->get($product);
+                $segments = $this->segmentExtractor->get($product);
 
                 foreach ($segments as $segment)
                 {

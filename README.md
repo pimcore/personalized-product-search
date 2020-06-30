@@ -23,23 +23,29 @@ For details about the architecture of this bundle please see the [corresponding 
 * Install the personalized search bundle like any other pimcore bundle
 
 ### Implement necessary interfaces
-The personalized search bundles needs some application dependend data to work. Therefore some interfaces are provided which must be implemented. Additionally, those implementations must be available for dependency injection.
+The personalized search bundles needs some application dependent data to work. Therefore some interfaces are provided 
+which must be implemented. Additionally, those implementations must be available for dependency injection.
 
-In `service.yaml` following entries must be added (keep in mind that the implementations can vary):
+In `service.yaml` following entries must be added (keep in mind that the implementations can vary). 
+
+#### ProductSegmentExtractorInterface
+The implementation of `ProductSegmentExtractorInterface` is responsible for extracting segments from a product. 
+A default implementation always returns an empty array, so this is an interface that you need to implement and overwrite: 
+
 ```yaml
-Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface: '@AppBundle\Ecommerce\IndexService\SegmentGetter'
+Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentExtractor\ProductSegmentExtractorInterface: '@AppBundle\Ecommerce\IndexService\SegmentGetter'
 AppBundle\Personalization\FactoryOrderManagerProvider: ~
 Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProvider: '@AppBundle\Personalization\FactoryOrderManagerProvider'
-
-AppBundle\Personalization\FactoryPersonalizationAdapterCustomerIdProvider: ~
-Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider: '@AppBundle\Personalization\FactoryPersonalizationAdapterCustomerIdProvider'
 ```
 
-#### GetterInterface
-The `GetterInterface` is part of the ecommerce framework. The implementation should return segments based on the given object which depends on the actual application.
-
 #### PersonalizationOrderManagerProvider
-Provides access to the order manager (part of the ecommerce bundle) as well as the customer class id.
+Provides access to the order manager (part of the ecommerce bundle) as well as the customer class id. A default implementation
+is provided, you might need to overwrite it. 
+
+```yaml
+AppBundle\Personalization\FactoryOrderManagerProvider: ~
+Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\PersonalizationOrderManagerProvider: '@AppBundle\Personalization\FactoryOrderManagerProvider'
+```
 
 ```php
 namespace AppBundle\Personalization;
@@ -65,7 +71,15 @@ class FactoryOrderManagerProvider implements PersonalizationOrderManagerProvider
 ```
 
 #### PersonalizationAdapterCustomerIdProvider
-Used to retrieve the id for the currently logged in user. In the following example functionality provided by the ecommerce framework is used.
+Used to retrieve the id for the currently logged in user. A default implementation is provided that reads the currently 
+logged in user from the symfony security. 
+
+In the following example functionality provided by the ecommerce framework is used.
+
+```yaml
+AppBundle\Personalization\FactoryPersonalizationAdapterCustomerIdProvider: ~
+Pimcore\Bundle\PersonalizedSearchBundle\Customer\PersonalizationAdapterCustomerIdProvider: '@AppBundle\Personalization\FactoryPersonalizationAdapterCustomerIdProvider'
+```
 
 ```php
 namespace AppBundle\Personalization;

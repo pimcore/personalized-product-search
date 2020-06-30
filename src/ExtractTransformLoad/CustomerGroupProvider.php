@@ -4,18 +4,26 @@ namespace Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad;
 
 
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
-use Pimcore\Bundle\EcommerceFrameworkBundle\IndexService\Getter\GetterInterface;
+use Pimcore\Bundle\PersonalizedSearchBundle\ExtractTransformLoad\SegmentExtractor\ProductSegmentExtractorInterface;
 use Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider\CustomerGroupIndexAccessProviderInterface;
 use Pimcore\Model\DataObject;
 
 class CustomerGroupProvider implements CustomerGroupInterface
 {
-    private $segmentGetter;
+    /**
+     * @var ProductSegmentExtractorInterface
+     */
+    private $segmentExtractor;
+
+    /**
+     * @var CustomerGroupIndexAccessProviderInterface
+     */
     private $customerGroupIndexAccessProvider;
+
     private const PROCENTUAL_INTERSECTION = 0.6;
 
-    public function __construct(GetterInterface $getter, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
-        $this->segmentGetter = $getter;
+    public function __construct(ProductSegmentExtractorInterface $segmentExtractor, CustomerGroupIndexAccessProviderInterface $customerGroupIndexAccessProvider) {
+        $this->segmentExtractor = $segmentExtractor;
         $this->customerGroupIndexAccessProvider = $customerGroupIndexAccessProvider;
     }
 
@@ -115,7 +123,7 @@ class CustomerGroupProvider implements CustomerGroupInterface
             {
                 $product = $item->getProduct();
 
-                $segments = $this->segmentGetter->get($product);
+                $segments = $this->segmentExtractor->get($product);
 
                 foreach ($segments as $segment)
                 {
