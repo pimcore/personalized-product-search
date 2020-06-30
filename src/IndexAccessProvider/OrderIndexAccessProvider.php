@@ -2,28 +2,15 @@
 
 namespace Pimcore\Bundle\PersonalizedSearchBundle\IndexAccessProvider;
 
-use Elasticsearch\ClientBuilder;
 
-/**
- * Class OrderIndexAccessProvider
- * @package PersonalizedSearchBundle\IndexAccessProvider
- */
-class OrderIndexAccessProvider implements IndexAccessProviderInterface
+class OrderIndexAccessProvider extends EsAwareIndexAccessProvider implements IndexAccessProviderInterface
 {
-
-    private $esClient;
 
     /**
      * @var string
      */
     private static $indexName = 'order_segments';
 
-    public function __construct()
-    {
-        if (class_exists('Elasticsearch\\ClientBuilder')) {
-            $this->esClient = ClientBuilder::create()->build();
-        }
-    }
 
     /**
      * Returns all purchase history segments of a customer
@@ -33,7 +20,7 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
     public function fetchSegments(int $customerId): array
     {
         $params = [
-            'index' => self::$indexName,
+            'index' => $this->indexPrefix . self::$indexName,
             'type' => '_doc',
             'body' => [
                 'query' => [
@@ -62,7 +49,7 @@ class OrderIndexAccessProvider implements IndexAccessProviderInterface
     public function index(int $documentId, object $body)
     {
         $params = [
-            'index' => self::$indexName,
+            'index' => $this->indexPrefix . self::$indexName,
             'type' => '_doc',
             'id' => $documentId,
             'body' => $body
